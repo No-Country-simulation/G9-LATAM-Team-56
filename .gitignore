@@ -1,0 +1,12 @@
+# Archivos de configuración de IntelliJ / IDEs
+.idea/
+*.iml
+.vscode/
+
+# Archivos de compilación de Java/Maven
+**/target/
+*.class
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
