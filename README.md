@@ -35,6 +35,7 @@ G9-LATAM-Team-56
 ├── oci-infrastructure/     # Configuración y scripts para despliegue en OCI
 └── science/                # Notebooks de Python, Análisis Exploratorio (EDA) y Modelos ML
 ```
+<br>
 
 ## 🛠️ Requisitos Previos
 
@@ -44,6 +45,7 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado en tu computadora:
 2. **Java JDK 21** (configurado en IntelliJ).
 3. **MySQL Server 8.0+** corriendo en tu máquina (vía MySQL Workbench, XAMPP o servicio local).
 4. **Git** integrado en IntelliJ o en tu terminal.
+<br>
 
 ## 🚀 Pasos para Clonar y Ejecutar 
 
@@ -62,6 +64,7 @@ cd G9-LATAM-Team-56
 2. En la pantalla de bienvenida, selecciona **Git / Get from Version Control...** (o ve al menú `File` > `New` > `Project from Version Control...`).
 3. Pega la URL del repositorio de GitHub: `[https://github.com/TuUsuario/G9-LATAM-Team-56.git](https://github.com/TuUsuario/G9-LATAM-Team-56.git)`
 4. Haz clic en **Clone**.
+<br>
 
 ### 2. Configurar la Base de Datos MySQL
 
@@ -73,6 +76,7 @@ Dado que el proyecto utiliza Spring Data JPA, requiere una base de datos activa 
 ```SQL
 CREATE DATABASE finance_ia;
 ```
+<br>
 
 ### 3. Configurar Credenciales (`application.properties`)
 
@@ -86,6 +90,7 @@ spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 ```
 
 Asegúrate de definir las variables de entorno en tu sistema/IDE, o reemplazar `${DB_USER}` y `${DB_PASSWORD}` por tus credenciales locales de MySQL (ej. `root` y tu contraseña).
+<br>
 
 ### 4. Compilar y Ejecutar la API
 
@@ -98,7 +103,7 @@ Navega a la carpeta del proyecto Spring Boot y ejecuta la aplicación:
 ```    Plaintext
 http://localhost:8080
 ```
-
+<br>
 
 ## 📄 Licencia
 
