@@ -1,18 +1,10 @@
 # FinanceAI — Asistente Inteligente de Salud Financiera 💡📊
 
-MVP desarrollado para el análisis inteligente de hábitos financieros, categorización automática de gastos y evaluación del perfil financiero del usuario mediante Inteligencia Artificial y la nube de OCI.
+API REST del asistente inteligente de salud financiera.  
+Parte del MVP desarrollado para el Hackathon Fintech / Educación Financiera en colaboración con [No Country](https://www.nocountry.tech/).
 
+>Transforma datos financieros brutos en conocimiento claro, visual y accionable.
 
-**FinanceAI** es una solución webapp orientada al sector Fintech y de educación financiera[cite: 1]. Permite a los usuarios comprender mejor sus hábitos de consumo a partir del análisis de sus transacciones, transformando datos brutos en conocimiento claro, visual y accionable.
-<br>
-
-### Funcionalidades Clave (MVP):
-- 🏷️ **Clasificación automática de transacciones:** Categorización inteligente en sectores como Alimentación, Transporte, Salud, Vivienda, Educación, Ocio y Servicios.
-- 📈 **Análisis de Perfil Financiero:** Clasificación del nivel de salud financiera del usuario (*Saludable*, *En observación*, *En riesgo*).
-- 💡 **Recomendaciones Personalizadas:** Sugerencias automáticas y objetivas para reducir gastos desmedidos e incentivar el ahorro.
-- 🔌 **API REST:** Respuestas en formato JSON preparadas para consumo frontend e integración con modelos de Ciencia de Datos.
-- ☁️ **Integración OCI:** Infraestructura respaldada por servicios de Oracle Cloud Infrastructure.
-<br>
 
 ## 📂 Estructura del Proyecto
 
@@ -58,13 +50,6 @@ git clone https://github.com/No-Country-simulation/G9-LATAM-Team-56.git
 cd G9-LATAM-Team-56
 ```
 
-### 1.1 Clonar el repositorio en IntelliJ IDEA
-
-1. Abre **IntelliJ IDEA**.
-2. En la pantalla de bienvenida, selecciona **Git / Get from Version Control...** (o ve al menú `File` > `New` > `Project from Version Control...`).
-3. Pega la URL del repositorio de GitHub: `[https://github.com/TuUsuario/G9-LATAM-Team-56.git](https://github.com/TuUsuario/G9-LATAM-Team-56.git)`
-4. Haz clic en **Clone**.
-<br>
 
 ### 2. Configurar la Base de Datos MySQL
 
@@ -76,7 +61,7 @@ Dado que el proyecto utiliza Spring Data JPA, requiere una base de datos activa 
 ```SQL
 CREATE DATABASE finance_ia;
 ```
-<br>
+
 
 ### 3. Configurar Credenciales (`application.properties`)
 
@@ -90,7 +75,8 @@ spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 ```
 
 Asegúrate de definir las variables de entorno en tu sistema/IDE, o reemplazar `${DB_USER}` y `${DB_PASSWORD}` por tus credenciales locales de MySQL (ej. `root` y tu contraseña).
-<br>
+
+
 
 ### 4. Compilar y Ejecutar la API
 
@@ -100,12 +86,30 @@ Navega a la carpeta del proyecto Spring Boot y ejecuta la aplicación:
 2. Haz clic en el botón **Play verde (▶️)** al lado del método `main` o en la barra superior de IntelliJ.
 3. Espera a que cargue Maven y Spring Boot. Cuando veas en la consola el mensaje `Started ApiApplication in X seconds`, la API estará corriendo en:
 
-```    Plaintext
-http://localhost:8080
+```text
+http://localhost:8080/hello
 ```
+   
+Si el backend está levantado y conectado a la base de datos, verás el mensaje:
+  ```text
+¡Hola! La API de FinanceAI está en ejecución y lista para procesar transacciones. 🚀
+  ```
+
+> 📖 Para instrucciones detalladas de instalación, consulta la [Guía de Instalación](https://github.com/No-Country-simulation/G9-LATAM-Team-56/wiki/Gu%C3%ADa-de-Instalaci%C3%B3n) en nuestra Wiki.
+
+<br>
+
+## 📚 Documentación
+
+|Recurso|Enlace|
+|:--|:--|
+|📖 Wiki del Proyecto|[Ver Wiki](https://github.com/No-Country-simulation/G9-LATAM-Team-56/wiki)|
+|🛠️ Guía de Instalación Detallada|[Guía de Instalación](https://github.com/No-Country-simulation/G9-LATAM-Team-56/wiki/Gu%C3%ADa-de-Instalaci%C3%B3n)|
+|🔌 API y Endpoints|[API y Endpoints](https://github.com/No-Country-simulation/G9-LATAM-Team-56/wiki/API-y-Endpoints)|
+|📊 Data Science|[DataSet Inicial](https://github.com/No-Country-simulation/G9-LATAM-Team-56/wiki/DataSet-Inicial)|
 <br>
 
 ## 📄 Licencia
 
-Proyecto desarrollado en el marco del Hackathon de Educación Financiera / Fintech.
+Proyecto desarrollado en el marco del Hackathon de Educación Financiera / Fintech — No Country Simulation.
 
