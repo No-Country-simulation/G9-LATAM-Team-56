@@ -104,7 +104,7 @@ Si el backend está levantado y conectado a la base de datos, verás el mensaje:
 |Recurso|Enlace|
 |:--|:--|
 |📖 Wiki del Proyecto|[Ver Wiki](https://github.com/No-Country-simulation/G9-LATAM-Team-56/wiki)|
-|🛠️ Guía de Instalación Detallada|[Guía de Instalación](https://github.com/No-Country-simulation/G9-LATAM-Team-56/wiki/Gu%C3%ADa-de-Instalaci%C3%B3n)|
+|🛠️ Guía de Instalación Detallada|[Guía de Instalación](https://github.com/No-Country-simulation/G9-LATAM-Team-56/wiki/Configuracion-inicial-del-Repositorio)|
 |🔌 API y Endpoints|[API y Endpoints](https://github.com/No-Country-simulation/G9-LATAM-Team-56/wiki/API-y-Endpoints)|
 |📊 Data Science|[DataSet Inicial](https://github.com/No-Country-simulation/G9-LATAM-Team-56/wiki/DataSet-Inicial)|
 <br>
