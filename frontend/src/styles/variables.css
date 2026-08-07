@@ -1,0 +1,23 @@
+:root {
+  --color-primario-azul: #042c40;
+  --color-secundario-azul: #006699;
+  --color-terciario-azul: #3399cc;
+  --color-primario-verde: #336633;
+  --color-secundario-verde: #339966;
+  --color-acento: #33ffff;
+
+  --neutro-negro: #000000;
+  --neutro-333: #333333;
+  --neutro-666: #666666;
+  --neutro-999: #999999;
+  --neutro-ccc: #cccccc;
+  --neutro-blanco: #ffffff;
+
+  --color-terciario: #e5f8fe;
+  --color-tarjeta-fondo: var(--color-terciario);
+
+  --font-principal: "Arimo", "Carlito", Arial, sans-serif;
+  --font-titulos: "Arimo", sans-serif;
+  --font-nombres: "Inter", sans-serif;
+  --font-texto: "Carlito", Arial, sans-serif;
+}
