@@ -1,0 +1,19 @@
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-badge-avatar img {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-badge-name {
+  font-family: var(--font-titulos);
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--color-secundario-azul);
+}
