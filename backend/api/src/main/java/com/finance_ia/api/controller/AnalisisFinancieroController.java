@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.finance_ia.api.dto.AnalisisFinancieroRequest;
 import com.finance_ia.api.dto.AnalisisFinancieroResponse;
+import com.finance_ia.api.dto.ClasificacionTransaccionesRequest;
+import com.finance_ia.api.dto.ClasificacionTransaccionesResponse;
 import com.finance_ia.api.dto.PerfilFinancieroRequest;
 import com.finance_ia.api.dto.PerfilFinancieroResponse;
 import com.finance_ia.api.service.AnalisisFinancieroService;
@@ -34,5 +36,12 @@ public class AnalisisFinancieroController {
 
         return service.obtenerPerfil(request);
     }
-    
+
+    @PostMapping("/clasificacion-transacciones")
+    public ClasificacionTransaccionesResponse clasificarTransacciones(
+            @RequestBody ClasificacionTransaccionesRequest request) {
+
+        return service.clasificarTransacciones(request);
+    }
+
 }

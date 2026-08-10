@@ -1,6 +1,5 @@
 package com.finance_ia.api.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -33,12 +32,14 @@ public class PerfilFinancieroOnnxService {
 
             env = OrtEnvironment.getEnvironment();
 
-            File modelFile = new ClassPathResource(
-                    "models/clasificador_perfil_financiero.onnx"
-            ).getFile();
+            ClassPathResource resource
+                    = new ClassPathResource(
+                            "models/clasificador_perfil_financiero.onnx"
+                    );
 
             session = env.createSession(
-                    modelFile.getAbsolutePath()
+                    resource.getInputStream().readAllBytes(),
+                    new OrtSession.SessionOptions()
             );
 
             System.out.println(
@@ -48,23 +49,23 @@ public class PerfilFinancieroOnnxService {
             System.out.println("--- INFORMACIÓN DEL MODELO ONNX ---");
 
             session.getInputInfo().forEach(
-                    (name, nodeInfo) ->
-                            System.out.println(
-                                    "📥 Entrada -> "
-                                            + name
-                                            + " | "
-                                            + nodeInfo.getInfo()
-                            )
+                    (name, nodeInfo)
+                    -> System.out.println(
+                            "📥 Entrada -> "
+                            + name
+                            + " | "
+                            + nodeInfo.getInfo()
+                    )
             );
 
             session.getOutputInfo().forEach(
-                    (name, nodeInfo) ->
-                            System.out.println(
-                                    "📤 Salida -> "
-                                            + name
-                                            + " | "
-                                            + nodeInfo.getInfo()
-                            )
+                    (name, nodeInfo)
+                    -> System.out.println(
+                            "📤 Salida -> "
+                            + name
+                            + " | "
+                            + nodeInfo.getInfo()
+                    )
             );
 
             System.out.println("-----------------------------------");
@@ -91,7 +92,7 @@ public class PerfilFinancieroOnnxService {
                     OnnxTensor.createTensor(
                             env,
                             new float[][]{
-                                    {request.getGasto_total().floatValue()}
+                                {request.getGasto_total().floatValue()}
                             }
                     )
             );
@@ -101,7 +102,7 @@ public class PerfilFinancieroOnnxService {
                     OnnxTensor.createTensor(
                             env,
                             new float[][]{
-                                    {request.getIngreso_mensual().floatValue()}
+                                {request.getIngreso_mensual().floatValue()}
                             }
                     )
             );
@@ -111,7 +112,7 @@ public class PerfilFinancieroOnnxService {
                     OnnxTensor.createTensor(
                             env,
                             new float[][]{
-                                    {request.getNivel_endeudamiento().floatValue()}
+                                {request.getNivel_endeudamiento().floatValue()}
                             }
                     )
             );
@@ -121,34 +122,34 @@ public class PerfilFinancieroOnnxService {
                     OnnxTensor.createTensor(
                             env,
                             new String[][]{
-                                    {request.getFrecuencia_ahorro()}
+                                {request.getFrecuencia_ahorro()}
                             }
                     )
             );
 
             OrtSession.Result resultado = session.run(inputs);
 
-            OnnxTensor labelTensor =
-                    (OnnxTensor) resultado.get("output_label").get();
+            OnnxTensor labelTensor
+                    = (OnnxTensor) resultado.get("output_label").get();
 
-            String perfil =
-                    ((String[]) labelTensor.getValue())[0];
+            String perfil
+                    = ((String[]) labelTensor.getValue())[0];
 
-            OnnxSequence probabilitySequence =
-                    (OnnxSequence) resultado.get("output_probability").get();
-
-            @SuppressWarnings("unchecked")
-            List<OnnxMap> listaMapas =
-                    (List<OnnxMap>) probabilitySequence.getValue();
+            OnnxSequence probabilitySequence
+                    = (OnnxSequence) resultado.get("output_probability").get();
 
             @SuppressWarnings("unchecked")
-            Map<String, Float> probabilidades =
-                    (Map<String, Float>) listaMapas.get(0).getValue();
+            List<OnnxMap> listaMapas
+                    = (List<OnnxMap>) probabilitySequence.getValue();
+
+            @SuppressWarnings("unchecked")
+            Map<String, Float> probabilidades
+                    = (Map<String, Float>) listaMapas.get(0).getValue();
 
             Float probabilidad = probabilidades.get(perfil);
 
-            PerfilFinancieroResponse response =
-                    new PerfilFinancieroResponse();
+            PerfilFinancieroResponse response
+                    = new PerfilFinancieroResponse();
 
             response.setPerfil_financiero(perfil);
 

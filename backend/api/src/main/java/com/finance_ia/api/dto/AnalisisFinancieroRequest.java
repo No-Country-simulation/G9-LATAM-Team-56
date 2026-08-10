@@ -1,14 +1,13 @@
 package com.finance_ia.api.dto;
 
+import java.util.List;
+
 public class AnalisisFinancieroRequest {
 
     private Double ingreso_mensual;
     private Double nivel_endeudamiento;
     private String frecuencia_ahorro;
-    private Double gasto_total;
-
-    public AnalisisFinancieroRequest() {
-    }
+    private List<TransaccionRequest> transacciones;
 
     public Double getIngreso_mensual() {
         return ingreso_mensual;
@@ -34,11 +33,12 @@ public class AnalisisFinancieroRequest {
         this.frecuencia_ahorro = frecuencia_ahorro;
     }
 
-    public Double getGasto_total() {
-        return gasto_total;
+    public List<TransaccionRequest> getTransacciones() {
+        return transacciones;
     }
 
-    public void setGasto_total(Double gasto_total) {
-        this.gasto_total = gasto_total;
+    public void setTransacciones(List<TransaccionRequest> transacciones) {
+        this.transacciones = transacciones;
     }
+
 }
