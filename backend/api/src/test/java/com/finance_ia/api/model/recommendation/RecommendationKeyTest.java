@@ -1,9 +1,9 @@
 package com.finance_ia.api.model.recommendation;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class RecommendationKeyTest {
 
@@ -12,12 +12,12 @@ class RecommendationKeyTest {
     void shouldCreateValidRecommendationKey() {
 
         RecommendationKey key = new RecommendationKey(
-                ExpenseCategory.RESTAURANTE,
+                ExpenseCategory.RESTAURANT,
                 FinancialProfile.RIESGO
         );
 
         assertEquals(
-                ExpenseCategory.RESTAURANTE,
+                ExpenseCategory.RESTAURANT,
                 key.category()
         );
 
@@ -47,7 +47,7 @@ class RecommendationKeyTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> new RecommendationKey(
-                        ExpenseCategory.RESTAURANTE,
+                        ExpenseCategory.RESTAURANT,
                         null
                 )
         );
@@ -58,12 +58,12 @@ class RecommendationKeyTest {
     void shouldConsiderEqualKeysAsEqual() {
 
         RecommendationKey key1 = new RecommendationKey(
-                ExpenseCategory.RESTAURANTE,
+                ExpenseCategory.RESTAURANT,
                 FinancialProfile.RIESGO
         );
 
         RecommendationKey key2 = new RecommendationKey(
-                ExpenseCategory.RESTAURANTE,
+                ExpenseCategory.RESTAURANT,
                 FinancialProfile.RIESGO
         );
 

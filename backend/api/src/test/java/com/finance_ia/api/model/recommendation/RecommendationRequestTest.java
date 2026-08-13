@@ -1,12 +1,12 @@
 package com.finance_ia.api.model.recommendation;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 class RecommendationRequestTest {
 
@@ -16,7 +16,7 @@ class RecommendationRequestTest {
 
         List<TopCategory> categories = List.of(
                 new TopCategory(
-                        ExpenseCategory.RESTAURANTE,
+                        ExpenseCategory.RESTAURANT,
                         1
                 ),
                 new TopCategory(
@@ -52,7 +52,7 @@ class RecommendationRequestTest {
 
         List<TopCategory> categories = List.of(
                 new TopCategory(
-                        ExpenseCategory.RESTAURANTE,
+                        ExpenseCategory.RESTAURANT,
                         1
                 )
         );
@@ -100,7 +100,7 @@ class RecommendationRequestTest {
 
         categories.add(
                 new TopCategory(
-                        ExpenseCategory.RESTAURANTE,
+                        ExpenseCategory.RESTAURANT,
                         1
                 )
         );
