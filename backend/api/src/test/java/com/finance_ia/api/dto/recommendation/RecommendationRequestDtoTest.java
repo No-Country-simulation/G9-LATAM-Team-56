@@ -1,13 +1,14 @@
 package com.finance_ia.api.dto.recommendation;
 
-import com.finance_ia.api.model.recommendation.ExpenseCategory;
-import com.finance_ia.api.model.recommendation.FinancialProfile;
-import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
+
+import com.finance_ia.api.model.recommendation.ExpenseCategory;
+import com.finance_ia.api.model.recommendation.FinancialProfile;
 
 class RecommendationRequestDtoTest {
 
@@ -16,7 +17,7 @@ class RecommendationRequestDtoTest {
 
         List<TopCategoryDto> categories = List.of(
                 new TopCategoryDto(
-                        ExpenseCategory.RESTAURANTE,
+                        ExpenseCategory.RESTAURANT,
                         1
                 ),
                 new TopCategoryDto(
@@ -51,7 +52,7 @@ class RecommendationRequestDtoTest {
 
         List<TopCategoryDto> categories = List.of(
                 new TopCategoryDto(
-                        ExpenseCategory.RESTAURANTE,
+                        ExpenseCategory.RESTAURANT,
                         1
                 )
         );
@@ -96,7 +97,7 @@ class RecommendationRequestDtoTest {
 
         categories.add(
                 new TopCategoryDto(
-                        ExpenseCategory.RESTAURANTE,
+                        ExpenseCategory.RESTAURANT,
                         1
                 )
         );

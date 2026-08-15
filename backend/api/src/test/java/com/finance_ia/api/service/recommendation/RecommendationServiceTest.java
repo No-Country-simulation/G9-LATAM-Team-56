@@ -1,18 +1,20 @@
 package com.finance_ia.api.service.recommendation;
 
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import com.finance_ia.api.config.RecommendationProperties;
 import com.finance_ia.api.model.recommendation.ExpenseCategory;
 import com.finance_ia.api.model.recommendation.FinancialProfile;
 import com.finance_ia.api.model.recommendation.RecommendationRequest;
 import com.finance_ia.api.model.recommendation.RecommendationResponse;
 import com.finance_ia.api.model.recommendation.TopCategory;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class RecommendationServiceTest {
 
@@ -43,7 +45,7 @@ class RecommendationServiceTest {
                         FinancialProfile.RIESGO,
                         List.of(
                                 new TopCategory(
-                                        ExpenseCategory.RESTAURANTE,
+                                        ExpenseCategory.RESTAURANT,
                                         1
                                 ),
                                 new TopCategory(
@@ -79,7 +81,7 @@ class RecommendationServiceTest {
                                         1
                                 ),
                                 new TopCategory(
-                                        ExpenseCategory.RESTAURANTE,
+                                        ExpenseCategory.RESTAURANT,
                                         2
                                 )
                         )
@@ -107,7 +109,7 @@ class RecommendationServiceTest {
                                         1
                                 ),
                                 new TopCategory(
-                                        ExpenseCategory.RESTAURANTE,
+                                        ExpenseCategory.RESTAURANT,
                                         2
                                 ),
                                 new TopCategory(
@@ -148,7 +150,7 @@ class RecommendationServiceTest {
                         FinancialProfile.RIESGO,
                         List.of(
                                 new TopCategory(
-                                        ExpenseCategory.RESTAURANTE,
+                                        ExpenseCategory.RESTAURANT,
                                         1
                                 ),
                                 new TopCategory(
@@ -233,7 +235,7 @@ class RecommendationServiceTest {
                                         1
                                 ),
                                 new TopCategory(
-                                        ExpenseCategory.RESTAURANTE,
+                                        ExpenseCategory.RESTAURANT,
                                         2
                                 )
                         )

@@ -1,15 +1,16 @@
 package com.finance_ia.api.service.recommendation;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.stereotype.Component;
+
 import com.finance_ia.api.model.recommendation.ExpenseCategory;
 import com.finance_ia.api.model.recommendation.FinancialProfile;
 import com.finance_ia.api.model.recommendation.RecommendationKey;
 import com.finance_ia.api.model.recommendation.RecommendationPriority;
 import com.finance_ia.api.model.recommendation.RecommendationRule;
-import org.springframework.stereotype.Component;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 @Component
 public class RecommendationRuleCatalog {
@@ -84,15 +85,15 @@ public class RecommendationRuleCatalog {
                 RecommendationPriority.ALTA);
 
         // Restaurante
-        add(rules, ExpenseCategory.RESTAURANTE, FinancialProfile.SALUDABLE,
+        add(rules, ExpenseCategory.RESTAURANT, FinancialProfile.SALUDABLE,
                 "Mantener el gasto dentro de un presupuesto destinado a consumo fuera del hogar.",
                 RecommendationPriority.BAJA);
 
-        add(rules, ExpenseCategory.RESTAURANTE, FinancialProfile.EN_OBSERVACION,
+        add(rules, ExpenseCategory.RESTAURANT, FinancialProfile.EN_OBSERVACION,
                 "Reducir la frecuencia de comidas fuera del hogar y establecer un límite de gasto.",
                 RecommendationPriority.MEDIA);
 
-        add(rules, ExpenseCategory.RESTAURANTE, FinancialProfile.RIESGO,
+        add(rules, ExpenseCategory.RESTAURANT, FinancialProfile.RIESGO,
                 "Priorizar la reducción de gastos en restaurantes y limitar el consumo fuera del hogar mientras se estabiliza la situación financiera.",
                 RecommendationPriority.ALTA);
 

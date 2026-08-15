@@ -1,9 +1,9 @@
 package com.finance_ia.api.model.recommendation;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class TopCategoryTest {
 
@@ -12,12 +12,12 @@ class TopCategoryTest {
     void shouldCreateValidTopCategory() {
 
         TopCategory topCategory = new TopCategory(
-                ExpenseCategory.RESTAURANTE,
+                ExpenseCategory.RESTAURANT,
                 1
         );
 
         assertEquals(
-                ExpenseCategory.RESTAURANTE,
+                ExpenseCategory.RESTAURANT,
                 topCategory.category()
         );
 
@@ -44,7 +44,7 @@ class TopCategoryTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> new TopCategory(
-                        ExpenseCategory.RESTAURANTE,
+                        ExpenseCategory.RESTAURANT,
                         0
                 )
         );
@@ -57,7 +57,7 @@ class TopCategoryTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> new TopCategory(
-                        ExpenseCategory.RESTAURANTE,
+                        ExpenseCategory.RESTAURANT,
                         -1
                 )
         );
