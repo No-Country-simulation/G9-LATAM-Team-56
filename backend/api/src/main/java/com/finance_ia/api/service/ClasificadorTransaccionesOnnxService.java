@@ -57,7 +57,8 @@ public class ClasificadorTransaccionesOnnxService {
                         new TransaccionResponse(
                                 transaccion.getDescripcion(),
                                 transaccion.getValor(),
-                                categoria
+                                categoria,
+                                transaccion.getFecha()
                         );
 
                 transaccionesCategorizadas.add(response);

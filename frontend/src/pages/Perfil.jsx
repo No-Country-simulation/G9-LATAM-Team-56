@@ -1,8 +1,8 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import Sidebar from "../components/Sidebar";
 import UserBadge from "../components/UserBadge";
-import { uploadCsvFile } from "/services/api"; // Importamos el servicio que conecta con el backend
+import { uploadCsvFile, obtenerDatosPerfil } from "/services/api";
 import "./Perfil.css";
 
 function Perfil() {
@@ -11,23 +11,58 @@ function Perfil() {
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
 
+  // Estados para almacenar el nombre y correo del usuario logueado
+  const [nombreUsuario, setNombreUsuario] = useState("Usuario");
+  const [correoUsuario, setCorreoUsuario] = useState("correo@finance.dev");
+
+
+  // Estado para la información de la cuenta inicializado con valores por defecto
+  const [cuentaInfo, setCuentaInfo] = useState([
+      { label: "Moneda", value: "Cargando...", icon: "mdi:currency-usd" },
+      { label: "Ingreso Mensual", value: "Cargando...", icon: "mdi:cash" },
+      { label: "Saldo Total", value: "Cargando...", icon: "mdi:wallet-outline" },
+      { label: "Nivel de Endeudamiento", value: "Cargando...", icon: "mdi:percent-outline" },
+  ]);
+
   // Referencia para activar el input de archivos de forma invisible mediante el botón
   const fileInputRef = useRef(null);
 
-  const cuentaInfo = [
-    { label: "Moneda", value: "USD Dólar", icon: "mdi:currency-usd" },
-    { label: "Ingreso Mensual", value: "$2,000", icon: "mdi:cash" },
-    { label: "Saldo Total", value: "$1,250", icon: "mdi:wallet-outline" },
-    {
-      label: "Nivel de Endeudamiento",
-      value: "25%",
-      icon: "mdi:percent-outline",
-    },
-  ];
+  // useEffect para cargar los datos del usuario y sus finanzas desde la BD al abrir la página
+  useEffect(() => {
+    const nombreGuardado = localStorage.getItem("usuarioNombre");
+    const correoGuardado = localStorage.getItem("usuarioEmail");
+
+    if (nombreGuardado) setNombreUsuario(nombreGuardado);
+    if (correoGuardado) {
+        setCorreoUsuario(correoGuardado);
+
+    // Llamamos al backend para traer los valores financieros reales de este correo
+       obtenerDatosPerfil(correoGuardado)
+         .then((data) => {
+             // Actualizamos el arreglo con los datos que vinieron de la BD de Spring Boot
+             setCuentaInfo([
+                 { label: "Moneda", value: data.moneda, icon: "mdi:currency-usd" },
+                 { label: "Ingreso Mensual", value: data.ingresoMensual, icon: "mdi:cash" },
+                 { label: "Saldo Total", value: data.saldoTotal, icon: "mdi:wallet-outline" },
+                 { label: "Nivel de Endeudamiento", value: data.nivelEndeudamiento, icon: "mdi:percent-outline" },
+             ]);
+         })
+         .catch((err) => {
+             console.error("No se pudieron cargar los datos financieros:", err);
+             // Valores de respaldo en caso de que ocurra un error de conexión
+             setCuentaInfo([
+                 { label: "Moneda", value: "USD Dólar", icon: "mdi:currency-usd" },
+                 { label: "Ingreso Mensual", value: "$0.0", icon: "mdi:cash" },
+                 { label: "Saldo Total", value: "$0.00", icon: "mdi:wallet-outline" },
+                 { label: "Nivel de Endeudamiento", value: "0%", icon: "mdi:percent-outline" },
+             ]);
+         });
+       }
+  }, []);
 
   // Función que se ejecuta cuando el usuario hace clic en "Importar CSV"
   const handleImportClick = () => {
-    fileInputRef.current.click(); // Simula el clic en el input de archivos oculto
+    fileInputRef.current.click();
   };
 
   // Función que procesa el archivo seleccionado y lo envía al backend
@@ -39,6 +74,10 @@ function Perfil() {
     if (!file.name.endsWith('.csv')) {
       setMessage('Error: Por favor, selecciona un archivo con formato .csv');
       setIsError(true);
+      // Ocultar el mensaje de error automáticamente después de 3 segundos
+      setTimeout(() => {
+          setMessage("");
+      }, 3000);
       return;
     }
 
@@ -47,17 +86,31 @@ function Perfil() {
     setIsError(false);
 
     try {
-      // Llamada a la API programada en Spring Boot
-      const responseMessage = await uploadCsvFile(file);
+      // Llamada a la API enviando tanto el archivo como el nombre del usuario
+      const responseMessage = await uploadCsvFile(file, nombreUsuario);
 
-      setMessage(responseMessage); // Mensaje de éxito proveniente de la API
+      setMessage('¡CSV importado con éxito!');
       setIsError(false);
+
+      // Recargar los datos del perfil automáticamente tras subir el CSV
+      const datosNuevos = await obtenerDatosPerfil(correoUsuario);
+      setCuentaInfo([
+          { label: "Moneda", value: datosNuevos.moneda, icon: "mdi:currency-usd" },
+          { label: "Ingreso Mensual", value: datosNuevos.ingresoMensual, icon: "mdi:cash" },
+          { label: "Saldo Total", value: datosNuevos.saldoTotal, icon: "mdi:wallet-outline" },
+          { label: "Nivel de Endeudamiento", value: datosNuevos.nivelEndeudamiento, icon: "mdi:percent-outline" },
+      ]);
+
     } catch (error) {
       setMessage(error.message || 'Ocurrió un error al subir el archivo.');
       setIsError(true);
     } finally {
       setLoading(false);
-      e.target.value = null; // Limpiar el input para permitir subir el mismo archivo otra vez si es necesario
+      e.target.value = null; // Limpiar el input para permitir subir el mismo archivo otra vez
+      // Ocultar el mensaje de éxito o error (del try/catch) después de 3 segundos
+      setTimeout(() => {
+          setMessage("");
+      }, 3000);
     }
   };
 
@@ -88,8 +141,9 @@ function Perfil() {
                   <Icon icon="mdi:account-circle" width="48" />
                 </div>
                 <div>
-                  <p className="user-name">Marcela G.</p>
-                  <p className="user-email">marcela.g@finance.dev</p>
+                  {/* 👈 Mostramos dinámicamente el nombre y correo obtenidos del login */}
+                  <p className="user-name">{nombreUsuario}</p>
+                  <p className="user-email">{correoUsuario}</p>
                 </div>
               </div>
               <div className="perfil-card-right">

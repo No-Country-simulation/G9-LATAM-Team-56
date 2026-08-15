@@ -1,31 +1,29 @@
-package com.finance_ia.api.dto;
+package com.finance_ia.api.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
-public class TransaccionResponse {
+@Entity
+@Table(name = "transaccion")
+public class TransaccionEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String descripcion;
-    private Double valor;
+    private double valor;
     private String categoria;
-
-    @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate fecha;
 
-    public TransaccionResponse() {
+    // --- GETTERS Y SETTERS ---
+
+    public Long getId() {
+        return id;
     }
 
-    public TransaccionResponse(
-            String descripcion,
-            Double valor,
-            String categoria,
-            LocalDate fecha) {
-
-        this.descripcion = descripcion;
-        this.valor = valor;
-        this.categoria = categoria;
-        this.fecha = fecha;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getDescripcion() {
@@ -36,11 +34,11 @@ public class TransaccionResponse {
         this.descripcion = descripcion;
     }
 
-    public Double getValor() {
+    public double getValor() {
         return valor;
     }
 
-    public void setValor(Double valor) {
+    public void setValor(double valor) {
         this.valor = valor;
     }
 

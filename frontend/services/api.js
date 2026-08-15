@@ -1,34 +1,36 @@
-// frontend/src/services/api.js
+import axios from 'axios';
 
-// URL base de tu backend de Spring Boot
-const API_BASE_URL = 'http://localhost:8080/api/csv';
+// URLs de backend en Spring Boot
+const API_URL = 'http://localhost:8080/api/csv';
+const AUTH_URL = 'http://localhost:8080/api/auth';
+const PERFIL_URL = 'http://localhost:8080/api/perfil';
 
-/**
- * Envía un archivo CSV al backend para su procesamiento y guardado en MySQL.
- * @param {File} file - El archivo CSV seleccionado por el usuario.
- * @returns {Promise<string>} - Mensaje de éxito del servidor.
- */
-
-export const uploadCsvFile = async (file) => {
+export const uploadCsvFile = async (file, usuario) => {
+  // Creamos un objeto FormData para enviar archivos y texto juntos
   const formData = new FormData();
-  // 'file' debe coincidir exactamente con el @RequestParam("file") del backend
   formData.append('file', file);
+  formData.append('usuario', usuario); // <- Aquí enviamos el parámetro que pide tu @RequestParam("usuario")
 
   try {
-    const response = await fetch(`${API_BASE_URL}/upload`, {
-      method: 'POST',
-      body: formData,
+    const response = await axios.post(`${API_URL}/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
-
-    const data = await response.text();
-
-    if (!response.ok) {
-      throw new Error(data || 'Error al subir el archivo CSV.');
-    }
-
-    return data;
+    return response.data;
   } catch (error) {
-    console.error('Error en el servicio de API:', error);
-    throw error;
+    throw new Error(error.response?.data?.message || 'Error al conectar con el servidor');
+  }
+};
+
+// FUNCIÓN PARA TRAER LOS DATOS FINANCIEROS DESDE LA BD
+export const obtenerDatosPerfil = async (email) => {
+  try {
+    const response = await axios.get(`${PERFIL_URL}/datos`, {
+      params: { email } // Enviamos el correo como parámetro para buscar al usuario
+    });
+    return response.data; // Retorna el JSON con moneda, ingresoMensual, saldoTotal, etc.
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Error al obtener los datos del perfil');
   }
 };
