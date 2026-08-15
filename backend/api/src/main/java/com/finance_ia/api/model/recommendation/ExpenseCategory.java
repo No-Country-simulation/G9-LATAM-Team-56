@@ -5,7 +5,7 @@ public enum ExpenseCategory {
     SERVICIOS,
     ALIMENTACION,
     TRANSPORTE,
-    RESTAURANTE,
+    RESTAURANT,
     ENTRETENIMIENTO,
     VESTUARIO,
     ELECTRONICOS,

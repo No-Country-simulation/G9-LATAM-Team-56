@@ -1,18 +1,23 @@
 package com.finance_ia.api.integration;
 
-import com.finance_ia.api.model.recommendation.ExpenseCategory;
-import com.finance_ia.api.model.recommendation.FinancialProfile;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import static org.junit.jupiter.api.Assertions.*;
+import com.finance_ia.api.model.recommendation.ExpenseCategory;
+import com.finance_ia.api.model.recommendation.FinancialProfile;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class RecommendationIntegrationTest {
@@ -34,7 +39,7 @@ class RecommendationIntegrationTest {
                     "profile": "RIESGO",
                     "topCategories": [
                         {
-                            "category": "RESTAURANTE",
+                            "category": "RESTAURANT",
                             "position": 1
                         },
                         {
@@ -140,7 +145,7 @@ class RecommendationIntegrationTest {
                         "position": 1
                     },
                     {
-                        "category": "RESTAURANTE",
+                        "category": "RESTAURANT",
                         "position": 2
                     }
                 ]
@@ -198,7 +203,7 @@ class RecommendationIntegrationTest {
                 "profile": "RIESGO",
                 "topCategories": [
                     {
-                        "category": "RESTAURANTE",
+                        "category": "RESTAURANT",
                         "position": 2
                     },
                     {
@@ -267,7 +272,7 @@ class RecommendationIntegrationTest {
                 "profile": "RIESGO",
                 "topCategories": [
                     {
-                        "category": "RESTAURANTE",
+                        "category": "RESTAURANT",
                         "position": 1
                     },
                     {

@@ -1,15 +1,16 @@
 package com.finance_ia.api.service.recommendation;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import com.finance_ia.api.model.recommendation.ExpenseCategory;
 import com.finance_ia.api.model.recommendation.FinancialProfile;
 import com.finance_ia.api.model.recommendation.RecommendationKey;
 import com.finance_ia.api.model.recommendation.RecommendationPriority;
 import com.finance_ia.api.model.recommendation.RecommendationRule;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class RecommendationRuleCatalogTest {
 
@@ -51,7 +52,7 @@ class RecommendationRuleCatalogTest {
     void shouldHaveHighPriorityForRestaurantRisk() {
 
         RecommendationKey key = new RecommendationKey(
-                ExpenseCategory.RESTAURANTE,
+                ExpenseCategory.RESTAURANT,
                 FinancialProfile.RIESGO
         );
 

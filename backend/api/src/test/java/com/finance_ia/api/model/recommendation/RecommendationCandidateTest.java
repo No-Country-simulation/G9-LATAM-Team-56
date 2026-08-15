@@ -1,9 +1,9 @@
 package com.finance_ia.api.model.recommendation;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class RecommendationCandidateTest {
 
@@ -13,14 +13,14 @@ class RecommendationCandidateTest {
 
         RecommendationCandidate candidate =
                 new RecommendationCandidate(
-                        ExpenseCategory.RESTAURANTE,
+                        ExpenseCategory.RESTAURANT,
                         1,
                         "Reducir la frecuencia de comidas fuera del hogar.",
                         RecommendationPriority.MEDIA
                 );
 
         assertEquals(
-                ExpenseCategory.RESTAURANTE,
+                ExpenseCategory.RESTAURANT,
                 candidate.category()
         );
 
@@ -62,7 +62,7 @@ class RecommendationCandidateTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> new RecommendationCandidate(
-                        ExpenseCategory.RESTAURANTE,
+                        ExpenseCategory.RESTAURANT,
                         0,
                         "Recomendación de prueba",
                         RecommendationPriority.MEDIA
@@ -77,7 +77,7 @@ class RecommendationCandidateTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> new RecommendationCandidate(
-                        ExpenseCategory.RESTAURANTE,
+                        ExpenseCategory.RESTAURANT,
                         1,
                         "   ",
                         RecommendationPriority.MEDIA
@@ -92,7 +92,7 @@ class RecommendationCandidateTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> new RecommendationCandidate(
-                        ExpenseCategory.RESTAURANTE,
+                        ExpenseCategory.RESTAURANT,
                         1,
                         "Recomendación de prueba",
                         null

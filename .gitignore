@@ -10,3 +10,5 @@
 # Archivos del sistema operativo
 .DS_Store
 Thumbs.db
+# Configuración local del desarrollador
+application-local.properties

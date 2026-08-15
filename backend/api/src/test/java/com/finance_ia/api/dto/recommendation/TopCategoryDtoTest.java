@@ -1,9 +1,10 @@
 package com.finance_ia.api.dto.recommendation;
 
-import com.finance_ia.api.model.recommendation.ExpenseCategory;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import com.finance_ia.api.model.recommendation.ExpenseCategory;
 
 class TopCategoryDtoTest {
 
@@ -12,12 +13,12 @@ class TopCategoryDtoTest {
 
         TopCategoryDto dto =
                 new TopCategoryDto(
-                        ExpenseCategory.RESTAURANTE,
+                        ExpenseCategory.RESTAURANT,
                         1
                 );
 
         assertEquals(
-                ExpenseCategory.RESTAURANTE,
+                ExpenseCategory.RESTAURANT,
                 dto.category()
         );
 
@@ -45,7 +46,7 @@ class TopCategoryDtoTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> new TopCategoryDto(
-                        ExpenseCategory.RESTAURANTE,
+                        ExpenseCategory.RESTAURANT,
                         0
                 )
         );
@@ -57,7 +58,7 @@ class TopCategoryDtoTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> new TopCategoryDto(
-                        ExpenseCategory.RESTAURANTE,
+                        ExpenseCategory.RESTAURANT,
                         -1
                 )
         );

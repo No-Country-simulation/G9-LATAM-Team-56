@@ -4,6 +4,7 @@ public class TransaccionRequest {
 
     private String descripcion;
     private Double valor;
+    private String fecha;
 
     public TransaccionRequest() {
     }
@@ -22,5 +23,13 @@ public class TransaccionRequest {
 
     public void setValor(Double valor) {
         this.valor = valor;
+    }
+
+    public String getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(String fecha) {
+        this.fecha = fecha;
     }
 }
