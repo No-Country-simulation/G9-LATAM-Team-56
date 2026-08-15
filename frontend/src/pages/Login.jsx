@@ -1,20 +1,58 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./Login.css";
 import logo from "../assets/img/logo-financeai.jpg";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+
+  // Efecto para hacer que la alerta de error desaparezca a los 3 segundos
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => {
+        setErrorMessage("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
 
     if (!email.trim() || !password.trim()) {
-      alert("Por favor completa todos los campos.");
+      setErrorMessage("Por favor completa todos los campos.");
       return;
     }
 
-    console.log("Login enviado:", { email, password });
+    setLoading(true);
+
+    try {
+      // Petición al backend en Spring Boot
+      const response = await axios.post("http://localhost:8080/api/auth/login", {
+        email,
+        password
+      });
+
+      // Guardamos datos en localStorage y redirigimos
+      localStorage.setItem("usuarioNombre", response.data.nombre);
+      localStorage.setItem("usuarioEmail", response.data.email);
+
+      navigate("/perfil");
+
+    } catch (error) {
+      console.error("Error en el login:", error);
+      const mensajeError = error.response?.data?.error || "Error al conectar con el servidor.";
+      setErrorMessage(mensajeError);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -62,10 +100,22 @@ function Login() {
               required
             />
 
-            <button type="submit" className="btn-primary">
-              Entrar
+            <button
+              type="submit"
+              className="btn-primary"
+              disabled={loading}
+              style={{ opacity: loading ? 0.7 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
+            >
+              {loading ? "Validando..." : "Entrar"}
             </button>
           </form>
+
+          {/* Alerta visual de error que se oculta sola a los 3 segundos */}
+          {errorMessage && (
+            <p style={{ color: "#ff6b6b", fontSize: "13px", marginTop: "10px", textAlign: "center", fontWeight: "500" }}>
+              {errorMessage}
+            </p>
+          )}
 
           <div className="form-links">
             <a href="#">Olvidé mi contraseña</a>
