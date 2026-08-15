@@ -1,0 +1,316 @@
+.estadisticas-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.estadisticas-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.estadisticas-dark-bg {
+  background-color: var(--color-primario-azul);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.estadisticas-topbar {
+  background-color: var(--color-terciario);
+  padding: 0 30px;
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--neutro-blanco);
+  border: 1px solid var(--color-terciario-azul);
+  border-radius: 20px;
+  padding: 8px 16px;
+  width: 280px;
+  color: var(--neutro-666);
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 13px;
+  font-family: var(--font-texto);
+}
+
+.estadisticas-hero,
+.estadisticas-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+.estadisticas-hero {
+  padding-top: 30px;
+  padding-bottom: 10px;
+  align-items: center;
+}
+
+.estadisticas-hero-title {
+  text-align: center;
+}
+
+.estadisticas-hero-title h1 {
+  font-family: var(--font-titulos);
+  font-size: 26px;
+  font-weight: bold;
+  color: var(--color-terciario);
+  margin-bottom: 4px;
+}
+
+.estadisticas-hero-title p {
+  font-family: var(--font-titulos);
+  font-size: 14px;
+  color: var(--color-terciario);
+  font-weight: lighter;
+}
+
+.estadisticas-filtro {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filtro-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-blanco-neutro);
+  font-size: 13px;
+  font-family: var(--font-titulos);
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+.filtro-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: transparent;
+  border: 1px solid var(--color-acento);
+  color: var(--color-acento);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-family: var(--font-nombres);
+  font-weight: lighter;
+  cursor: pointer;
+}
+
+.filtro-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 24px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%2333FFFF' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  font-family: var(--font-nombres);
+  font-weight: lighter;
+}
+
+.filtro-select option {
+  background-color: var(--color-primario-azul);
+  color: var(--neutro-blanco);
+}
+
+.filtro-fechas-wrapper {
+  position: relative;
+}
+
+.filtro-fechas-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background-color: var(--neutro-blanco);
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 10;
+  min-width: 200px;
+}
+
+.filtro-fechas-dropdown label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-family: var(--font-texto);
+  color: var(--neutro-666);
+}
+
+.filtro-fechas-dropdown input[type="date"] {
+  border: 1px solid var(--neutro-ccc);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-family: var(--font-texto);
+  font-size: 13px;
+  color: var(--neutro-333);
+}
+
+.filtro-fechas-aplicar {
+  background-color: var(--color-secundario-azul);
+  color: var(--neutro-blanco);
+  border: none;
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.filtro-fechas-aplicar:hover {
+  background-color: var(--color-primario-azul);
+}
+
+.estadisticas-content {
+  padding-top: 20px;
+  padding-bottom: 50px;
+}
+
+.grafico-card {
+  background-color: var(--color-terciario);
+  border-radius: 14px;
+  padding: 24px;
+  min-width: 0;
+}
+
+.grafico-card h2 {
+  font-family: var(--font-titulos);
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--neutro-333);
+  margin-bottom: 16px;
+}
+
+.grafico-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.grafico-tab {
+  border: 1px solid var(--color-secundario-azul);
+  background-color: var(--neutro-blanco);
+  color: var(--color-secundario-azul);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 12px;
+  font-family: var(--font-nombres);
+  font-weight: lighter;
+  cursor: pointer;
+}
+
+.grafico-tab.active {
+  background-color: var(--color-secundario-azul);
+  color: var(--neutro-blanco);
+}
+
+.grafico-chart {
+  background-color: var(--neutro-blanco);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.resumen-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.resumen-card {
+  background-color: var(--color-terciario);
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.resumen-card-icon {
+  display: flex;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+}
+
+.resumen-card-icon.positivo {
+  color: var(--color-secundario-azul);
+}
+
+.resumen-card-icon.negativo {
+  color: #cc3333;
+}
+
+.tendencia-icon {
+  width: 26px;
+  height: 26px;
+}
+
+.resumen-card-info {
+  flex: 1;
+}
+
+.resumen-card-label {
+  font-family: var(--font-titulos);
+  font-size: 13px;
+  color: var(--color-primario-azul);
+  margin-bottom: 2px;
+  font-weight: bold;
+}
+
+.resumen-card-valor {
+  font-family: var(--font-texto);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--color-primario-azul);
+  font-weight: bold;
+}
+
+.resumen-card-sub {
+  font-family: var(--font-texto);
+  font-size: 11px;
+  color: var(--color-primario-azul);
+  font-weight: lighter;
+}
+
+.resumen-card-variacion {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+.resumen-card-variacion.positivo {
+  color: var(--color-secundario-verde);
+  font-family: var(--font-texto);
+  font-weight: lighter;
+}
+
+.resumen-card-variacion.negativo {
+  color: var(--color-rojo);
+  font-family: var(--font-texto);
+  font-weight: lighter;
+}

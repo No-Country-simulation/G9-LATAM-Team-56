@@ -1,15 +1,7 @@
-/* import Login from "./pages/Login";
+import EstadisticasA from "./pages/EstadisticasA";
 
 function App() {
-  return <Login />;
-}
-
-export default App; */
-
-import Perfil from "./pages/Perfil";
-
-function App() {
-  return <Perfil />;
+  return <EstadisticasA />;
 }
 
 export default App;
