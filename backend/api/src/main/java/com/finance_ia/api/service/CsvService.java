@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -41,7 +42,7 @@ public class CsvService {
         this.analisisRepository = analisisRepository;
     }
 
-    // Modificamos el método para que ahora reciba también el nombre de la persona
+    // Modificamos el metodo para que ahora reciba también el nombre de la persona
     public CsvResponse analizarYGuardarCsv(MultipartFile file, String nombreUsuario) {
 
         try (
@@ -109,36 +110,65 @@ public class CsvService {
             PerfilFinancieroResponse perfilResponse =
                     analisisFinancieroService.obtenerPerfil(perfilRequest);
 
-            // ==========================================
-            // 4. NUEVO: GUARDAR EN LA BASE DE DATOS MYSQL
-            // ==========================================
-            AnalisisFinancieroEntity entidadAnalisis = new AnalisisFinancieroEntity();
-            entidadAnalisis.setUsuarioNombre(nombreUsuario);
-            entidadAnalisis.setIngresoMensual(ingresoMensual);
-            entidadAnalisis.setNivelEndeudamiento(nivelEndeudamiento);
-            entidadAnalisis.setFrecuenciaAhorro(frecuenciaAhorro);
-            entidadAnalisis.setPerfilFinanciero(perfilResponse.getPerfil_financiero());
-            entidadAnalisis.setProbabilidad(perfilResponse.getProbabilidad());
+            // =========================================================================
+            // 4. GUARDAR O ACTUALIZAR EN LA BASE DE DATOS MYSQL (Evita duplicados)
+            // =========================================================================
 
-            // Convertimos las transacciones del DTO a Entidades de Base de Datos
-            List<TransaccionEntity> listaTransaccionesEntities = new ArrayList<>();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
+            Optional<AnalisisFinancieroEntity> analisisExistente = analisisRepository.findByUsuarioNombre(nombreUsuario);
 
-            for (TransaccionResponse txDto : transaccionesCategorizadas) {
-                TransaccionEntity txEntity = new TransaccionEntity();
-                txEntity.setDescripcion(txDto.getDescripcion());
-                txEntity.setValor(txDto.getValor());
-                txEntity.setCategoria(txDto.getCategoria());
+            AnalisisFinancieroEntity entidadAnalisis;
 
-                listaTransaccionesEntities.add(txEntity);
+            if (analisisExistente.isPresent()) {
+                // Recuperamos el registro anterior
+                entidadAnalisis = analisisExistente.get();
+                entidadAnalisis.setIngresoMensual(ingresoMensual);
+                entidadAnalisis.setNivelEndeudamiento(nivelEndeudamiento);
+                entidadAnalisis.setFrecuenciaAhorro(frecuenciaAhorro);
+                entidadAnalisis.setPerfilFinanciero(perfilResponse.getPerfil_financiero());
+                entidadAnalisis.setProbabilidad(perfilResponse.getProbabilidad());
+
+                // Vaciamos la lista existente y añadimos los nuevos elementos
+                entidadAnalisis.getTransacciones().clear();
+
+                for (TransaccionResponse txDto : transaccionesCategorizadas) {
+                    TransaccionEntity txEntity = new TransaccionEntity();
+                    txEntity.setDescripcion(txDto.getDescripcion());
+                    txEntity.setValor(txDto.getValor());
+                    txEntity.setCategoria(txDto.getCategoria());
+
+                    // Si tu relación tiene bidireccionalidad (la transacción apunta al análisis), descomenta la siguiente línea:
+                    // txEntity.setAnalisisFinanciero(entidadAnalisis);
+
+                    entidadAnalisis.getTransacciones().add(txEntity);
+                }
+
+            } else {
+                // SI NO EXISTE -> Creamos un objeto completamente nuevo
+                entidadAnalisis = new AnalisisFinancieroEntity();
+                entidadAnalisis.setUsuarioNombre(nombreUsuario);
+                entidadAnalisis.setIngresoMensual(ingresoMensual);
+                entidadAnalisis.setNivelEndeudamiento(nivelEndeudamiento);
+                entidadAnalisis.setFrecuenciaAhorro(frecuenciaAhorro);
+                entidadAnalisis.setPerfilFinanciero(perfilResponse.getPerfil_financiero());
+                entidadAnalisis.setProbabilidad(perfilResponse.getProbabilidad());
+
+                List<TransaccionEntity> listaTransaccionesEntities = new ArrayList<>();
+                for (TransaccionResponse txDto : transaccionesCategorizadas) {
+                    TransaccionEntity txEntity = new TransaccionEntity();
+                    txEntity.setDescripcion(txDto.getDescripcion());
+                    txEntity.setValor(txDto.getValor());
+                    txEntity.setCategoria(txDto.getCategoria());
+
+                    listaTransaccionesEntities.add(txEntity);
+                }
+
+                entidadAnalisis.setTransacciones(listaTransaccionesEntities);
             }
 
-            entidadAnalisis.setTransacciones(listaTransaccionesEntities);
-
-            // Guardamos todo en MySQL en una sola instrucción
+            // Guardamos o actualizamos en MySQL
             analisisRepository.save(entidadAnalisis);
 
-            // 5. Construir la respuesta final (DTO) para Postman
+            // 5. Construir la respuesta final (DTO) para Postman / Frontend
             CsvResponse response = new CsvResponse();
             response.setIngreso_mensual(ingresoMensual);
             response.setNivel_endeudamiento(nivelEndeudamiento);

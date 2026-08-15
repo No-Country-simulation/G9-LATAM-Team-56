@@ -9,6 +9,6 @@ import java.util.Optional;
 public interface AnalisisFinancieroRepository extends JpaRepository<AnalisisFinancieroEntity, Long> {
     // Hereda métodos CRUD automáticos como save(), saveAll(), findAll(), etc.
 
-    // Método para buscar el análisis financiero filtrando por el nombre o correo del usuario
-    Optional<AnalisisFinancieroEntity> findByUsuarioNombre(String nombre);
+    // Metodo que actualiza el análisis guardado.
+    Optional<AnalisisFinancieroEntity> findByUsuarioNombre(String usuarioNombre);
 }

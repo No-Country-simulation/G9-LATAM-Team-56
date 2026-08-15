@@ -39,7 +39,7 @@ public class PerfilController {
 
         UsuarioEntity usuario = usuarioOpt.get();
 
-        // Buscamos el registro financiero en la tabla Analisis_financiero usando el nombre o email del usuario
+        // Metodo que actualiza el registro (nunca se duplica)
         Optional<AnalisisFinancieroEntity> analisisOpt = analisisFinancieroRepository.findByUsuarioNombre(usuario.getNombre());
 
         Map<String, Object> datosFinancieros = new HashMap<>();
