@@ -1,0 +1,26 @@
+.gauge-placeholder {
+  position: relative;
+  width: 320px;
+  height: 180px;
+  margin: 0 auto;
+  background-color: transparent;
+  padding: 10px 10px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gauge-needle-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 10;
+  background-color: transparent;
+}
+
+.gauge-labels text {
+  fill: #0b2239;
+  font-size: 12px;
+  font-weight: 500;
+}

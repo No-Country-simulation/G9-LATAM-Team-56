@@ -4,10 +4,10 @@ import './Sidebar.css';
 
 function Sidebar() {
   const navItems = [
-    { label: 'Dashboard', icon: 'mdi:view-dashboard-outline' },
+    { label: 'Dashboard', icon: 'mdi:view-dashboard-outline'  },
     { label: 'Estadisticas Avanzadas', icon: 'mdi:chart-line' },
-    { label: 'Recomendaciones', icon: 'mdi:lightbulb-outline' },
-    { label: 'Perfil', icon: 'mdi:account-outline', active: true },
+    { label: 'Recomendaciones', icon: 'mdi:lightbulb-outline'},
+    { label: 'Perfil', icon: 'mdi:account-outline'},
   ];
 
   return (

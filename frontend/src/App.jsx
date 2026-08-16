@@ -6,10 +6,26 @@ function App() {
 
 export default App; */
 
-import Perfil from "./pages/Perfil";
+/* import Perfil from "./pages/Perfil";
 
 function App() {
   return <Perfil />;
 }
 
+export default App; */
+
+import Dashboard from "./pages/Dashboard";
+
+function App() {
+  return <Dashboard />;
+}
+
 export default App;
+
+/*  import Recomendaciones from "./pages/Recomendaciones";
+
+function App() {
+  return <Recomendaciones />;
+}
+
+export default App;*/

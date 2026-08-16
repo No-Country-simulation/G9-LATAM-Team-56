@@ -44,8 +44,17 @@
   background-color: var(--color-terciario);
 }
 
+/* Estado ACTIVO del enlace (Celeste claro como el prototipo) */
 .sidebar-link.active {
-  color: var(--color-primario-azul);
+  background-color: var(--color-terciario, ##005f87); /* Fondo celeste claro */
+  color: var(--color-primario-azul, #0b2239);       /* Texto/icono azul */
+  font-weight: 600;                                 /* Resalta el texto */
+  border-radius: 8px;                               /* Bordes redondeados suaves */
+}
+
+/* Para que el hover no afecte al elemento activo */
+.sidebar-link:hover:not(.active) {
+  background-color: rgba(224, 244, 252, 0.5); /* Celeste muy suave al pasar el cursor */
 }
 
 .sidebar-footer {
