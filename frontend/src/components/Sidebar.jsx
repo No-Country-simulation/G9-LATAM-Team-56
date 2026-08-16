@@ -1,11 +1,11 @@
 import { Icon } from '@iconify/react';
-import { useNavigate, useLocation } from 'react-router-dom'; // 👈 Importamos hooks de navegación
+import { useNavigate, useLocation } from 'react-router-dom'; // Importamos hooks de navegación
 import logo from '../assets/img/logo-financeai.jpg';
 import './Sidebar.css';
 
 function Sidebar() {
   const navigate = useNavigate();
-  const location = useLocation(); // 👈 Nos permite saber en qué ruta estamos actualmente
+  const location = useLocation(); // Nos permite saber en qué ruta estamos actualmente
 
   // Definimos las rutas (path) para cada ítem del menú
   const navItems = [
@@ -61,7 +61,7 @@ function Sidebar() {
         <a
           href="#logout"
           className="sidebar-link"
-          onClick={handleLogout} // 👈 Vinculamos la función de cierre de sesión
+          onClick={handleLogout} // Vinculamos la función de cierre de sesión
         >
           <Icon icon="mdi:logout" width="20" />
           <span>Log out</span>

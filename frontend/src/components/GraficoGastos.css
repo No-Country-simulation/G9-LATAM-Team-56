@@ -1,0 +1,55 @@
+.pie-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 16px;
+  width: 100%;
+}
+
+.pie-legend-container {
+  font-size: 12px;
+  line-height: 18px;
+  padding-left: 10px;
+  width: 40%;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.legend-color-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+.legend-text {
+  color: #333333;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recharts-default-legend .recharts-legend-item-text {
+  color: #333333 !important;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.empty-chart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #546e7a;
+  font-size: 12px;
+}
