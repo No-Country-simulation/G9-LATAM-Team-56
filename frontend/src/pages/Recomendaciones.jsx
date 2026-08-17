@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom"; // Importar el hook de navegación
 import { Icon } from "@iconify/react";
 import Sidebar from "../components/Sidebar";
 import UserBadge from "../components/UserBadge";
@@ -50,6 +51,13 @@ const getStatusConfig = (prioridad) => {
 
 //------------------------------------------------------------------------------------------------------------------
 export default function Recomendaciones() {
+  const navigate = useNavigate(); // Inicializar la función de navegación
+
+  // Función que maneja el evento al hacer clic en el botón
+  const handleVerDetalle = () => {
+      navigate("/estadisticas");
+    };
+
   return (
     <div className="recomendaciones-layout">
       <Sidebar />
@@ -94,7 +102,8 @@ export default function Recomendaciones() {
                     {/* SECCIÓN DERECHA */}
                     <div className="rec-card-right">
                       <Icon icon="flat-color-icons:combo-chart" width="44" className="rec-action-icon" />
-                      <button type="button" className="btn-blue-action">
+                      {/* Añadido el evento onClick llamando a la función de redirección */}
+                      <button type="button" className="btn-blue-action" onClick={handleVerDetalle}>
                         Ver detalle
                       </button>
                     </div>

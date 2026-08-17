@@ -17,6 +17,7 @@ public class AnalisisFinancieroEntity {
     private String frecuenciaAhorro;
     private String perfilFinanciero;
     private double probabilidad;
+    private Double saldoTotal;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "analisis_financiero_id") // Crea la llave foránea en la tabla de transacciones
@@ -87,4 +88,8 @@ public class AnalisisFinancieroEntity {
     public void setTransacciones(List<TransaccionEntity> transacciones) {
         this.transacciones = transacciones;
     }
+
+    public Double getSaldoTotal() { return saldoTotal; }
+
+    public void setSaldoTotal(Double saldoTotal) { this.saldoTotal = saldoTotal; }
 }

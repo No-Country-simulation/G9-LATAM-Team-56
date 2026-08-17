@@ -1,4 +1,5 @@
 import { Icon } from "@iconify/react";
+import { useNavigate } from "react-router-dom"; // Importar el hook de navegación
 import Sidebar from "../components/Sidebar";
 import UserBadge from "../components/UserBadge";
 import "./Dashboard.css";
@@ -36,6 +37,12 @@ const formatearFecha = (fechaStr) => {
 
 function Dashboard() {
   const estadoSalud = obtenerEstadoSalud(GAUGE_MOCK.scoreValue);
+  const navigate = useNavigate(); // Inicializar la función de navegación
+
+  // Función que maneja el evento al hacer clic en el botón
+    const handleVerDetalle = () => {
+        navigate("/recomendaciones");
+      };
 
   return (
     <div className="dashboard-layout">
@@ -182,7 +189,8 @@ function Dashboard() {
                   </div>
 
                   <div className="rec-card-bottom">
-                    <button type="button" className="btn-green-full">
+                    {/* Añadido el evento onClick llamando a la función de redirección */}
+                    <button type="button" className="btn-green-full" onClick={handleVerDetalle}>
                       Ver detalles
                     </button>
                   </div>

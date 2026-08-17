@@ -44,7 +44,7 @@ function Login() {
       localStorage.setItem("usuarioNombre", response.data.nombre);
       localStorage.setItem("usuarioEmail", response.data.email);
 
-      navigate("/perfil");
+      navigate("/dashboard");
 
     } catch (error) {
       console.error("Error en el login:", error);
