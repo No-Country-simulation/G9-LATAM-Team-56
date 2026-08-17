@@ -84,7 +84,7 @@ public class CsvService {
                 transacciones.add(transaccion);
             }
 
-            // 1. Clasificar las transacciones llamando al servicio financiero
+            // Clasificar las transacciones llamando al servicio financiero
             ClasificacionTransaccionesRequest clasificacionRequest = new ClasificacionTransaccionesRequest();
             clasificacionRequest.setTransacciones(transacciones);
 
@@ -94,13 +94,16 @@ public class CsvService {
             List<TransaccionResponse> transaccionesCategorizadas =
                     clasificacionResponse.getTransacciones();
 
-            // 2. Calcular el gasto total sumando todas las transacciones
+            // Calcular el gasto total sumando todas las transacciones
             double gastoTotal = 0.0;
             for (TransaccionResponse transaccion : transaccionesCategorizadas) {
                 gastoTotal += transaccion.getValor();
             }
 
-            // 3. Obtener el perfil financiero del usuario
+            // CALCULAR EL SALDO TOTAL (Ingreso menos la suma de las transacciones)
+            double saldoTotalCalculado = ingresoMensual - gastoTotal;
+
+            // Obtener el perfil financiero del usuario
             PerfilFinancieroRequest perfilRequest = new PerfilFinancieroRequest();
             perfilRequest.setIngreso_mensual(ingresoMensual);
             perfilRequest.setNivel_endeudamiento(nivelEndeudamiento);
@@ -111,7 +114,7 @@ public class CsvService {
                     analisisFinancieroService.obtenerPerfil(perfilRequest);
 
             // =========================================================================
-            // 4. GUARDAR O ACTUALIZAR EN LA BASE DE DATOS MYSQL (Evita duplicados)
+            // GUARDAR O ACTUALIZAR EN LA BASE DE DATOS MYSQL (Evita duplicados)
             // =========================================================================
 
             Optional<AnalisisFinancieroEntity> analisisExistente = analisisRepository.findByUsuarioNombre(nombreUsuario);
@@ -126,18 +129,21 @@ public class CsvService {
                 entidadAnalisis.setFrecuenciaAhorro(frecuenciaAhorro);
                 entidadAnalisis.setPerfilFinanciero(perfilResponse.getPerfil_financiero());
                 entidadAnalisis.setProbabilidad(perfilResponse.getProbabilidad());
+                entidadAnalisis.setSaldoTotal(saldoTotalCalculado);
 
                 // Vaciamos la lista existente y añadimos los nuevos elementos
                 entidadAnalisis.getTransacciones().clear();
 
-                for (TransaccionResponse txDto : transaccionesCategorizadas) {
+                for (int i = 0; i < transaccionesCategorizadas.size(); i++) {
+                    TransaccionResponse txDto = transaccionesCategorizadas.get(i);
+                    TransaccionRequest txReq = transacciones.get(i); // Obtenemos la fecha original del CSV
+
                     TransaccionEntity txEntity = new TransaccionEntity();
                     txEntity.setDescripcion(txDto.getDescripcion());
                     txEntity.setValor(txDto.getValor());
                     txEntity.setCategoria(txDto.getCategoria());
-
-                    // Si tu relación tiene bidireccionalidad (la transacción apunta al análisis), descomenta la siguiente línea:
-                    // txEntity.setAnalisisFinanciero(entidadAnalisis);
+                    txEntity.setFecha(txReq.getFecha());
+                    txEntity.setAnalisisFinanciero(entidadAnalisis); // ASIGNAR LA RELACIÓN BIDIRECCIONAL
 
                     entidadAnalisis.getTransacciones().add(txEntity);
                 }
@@ -151,13 +157,19 @@ public class CsvService {
                 entidadAnalisis.setFrecuenciaAhorro(frecuenciaAhorro);
                 entidadAnalisis.setPerfilFinanciero(perfilResponse.getPerfil_financiero());
                 entidadAnalisis.setProbabilidad(perfilResponse.getProbabilidad());
+                entidadAnalisis.setSaldoTotal(saldoTotalCalculado);
 
                 List<TransaccionEntity> listaTransaccionesEntities = new ArrayList<>();
-                for (TransaccionResponse txDto : transaccionesCategorizadas) {
+                for (int i = 0; i < transaccionesCategorizadas.size(); i++) {
+                    TransaccionResponse txDto = transaccionesCategorizadas.get(i);
+                    TransaccionRequest txReq = transacciones.get(i);
+
                     TransaccionEntity txEntity = new TransaccionEntity();
                     txEntity.setDescripcion(txDto.getDescripcion());
                     txEntity.setValor(txDto.getValor());
                     txEntity.setCategoria(txDto.getCategoria());
+                    txEntity.setFecha(txReq.getFecha());
+                    txEntity.setAnalisisFinanciero(entidadAnalisis); // ASIGNAR LA RELACIÓN BIDIRECCIONAL
 
                     listaTransaccionesEntities.add(txEntity);
                 }

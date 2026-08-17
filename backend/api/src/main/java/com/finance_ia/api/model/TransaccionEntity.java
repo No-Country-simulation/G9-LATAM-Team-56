@@ -16,45 +16,28 @@ public class TransaccionEntity {
     private String categoria;
     private LocalDate fecha;
 
+    // AGREGAR LA RELACIÓN INVERSA (ManyToOne) hacia el Análisis Financiero
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "analisis_financiero_id")
+    private AnalisisFinancieroEntity analisisFinanciero;
+
     // --- GETTERS Y SETTERS ---
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
-    public String getDescripcion() {
-        return descripcion;
-    }
+    public Double getValor() { return valor; }
+    public void setValor(Double valor) { this.valor = valor; }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
+    public String getCategoria() { return categoria; }
+    public void setCategoria(String categoria) { this.categoria = categoria; }
 
-    public double getValor() {
-        return valor;
-    }
+    public LocalDate getFecha() { return fecha; }
+    public void setFecha(LocalDate fecha) { this.fecha = fecha; }
 
-    public void setValor(double valor) {
-        this.valor = valor;
-    }
-
-    public String getCategoria() {
-        return categoria;
-    }
-
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
-    }
-
-    public LocalDate getFecha() {
-        return fecha;
-    }
-
-    public void setFecha(LocalDate fecha) {
-        this.fecha = fecha;
-    }
+    public AnalisisFinancieroEntity getAnalisisFinanciero() { return analisisFinanciero; }
+    public void setAnalisisFinanciero(AnalisisFinancieroEntity analisisFinanciero) { this.analisisFinanciero = analisisFinanciero; }
 }

@@ -49,6 +49,7 @@ public class PerfilController {
         if (analisisOpt.isPresent()) {
             AnalisisFinancieroEntity analisis = analisisOpt.get();
             Double ingreso = analisis.getIngresoMensual();
+            Double saldo = analisis.getSaldoTotal();
 
             // Configuramos el formato inglés (Coma para miles, punto para decimales)
             DecimalFormatSymbols simbolos = new DecimalFormatSymbols(Locale.US);
@@ -58,13 +59,14 @@ public class PerfilController {
             // - .0# garantiza que muestre al menos un decimal y hasta dos si existen.
             DecimalFormat formateador = new DecimalFormat("#,##0.0#", simbolos);
 
-            // Formateamos el número Double
-            String ingresoFormateado = (ingreso != null) ? "$" + formateador.format(ingreso): "$ 0";
+            // Formateamos el ingreso mensual y saldo total
+            String ingresoFormateado = (ingreso != null) ? "$" + formateador.format(ingreso): "$0";
+            String saldoFormateado = (saldo != null) ? "$" + formateador.format(saldo) : "$0";
 
             // Extraemos los valores reales de la base de datos y les damos formato visual
             datosFinancieros.put("ingresoMensual", ingresoFormateado);
             datosFinancieros.put("nivelEndeudamiento", analisis.getNivelEndeudamiento() + "%");
-            datosFinancieros.put("saldoTotal", "$3,100"); // (Si tienes otra tabla para saldo, la puedes consultar aquí igual)
+            datosFinancieros.put("saldoTotal", saldoFormateado);
         } else {
             // Si el usuario aún no ha subido ningún CSV o no hay registros, enviamos valores por defecto en 0
             datosFinancieros.put("ingresoMensual", "$0");
