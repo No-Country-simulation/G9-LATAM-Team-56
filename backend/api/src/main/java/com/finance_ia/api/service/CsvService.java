@@ -134,11 +134,16 @@ public class CsvService {
                 // Vaciamos la lista existente y añadimos los nuevos elementos
                 entidadAnalisis.getTransacciones().clear();
 
-                for (TransaccionResponse txDto : transaccionesCategorizadas) {
+                for (int i = 0; i < transaccionesCategorizadas.size(); i++) {
+                    TransaccionResponse txDto = transaccionesCategorizadas.get(i);
+                    TransaccionRequest txReq = transacciones.get(i); // Obtenemos la fecha original del CSV
+
                     TransaccionEntity txEntity = new TransaccionEntity();
                     txEntity.setDescripcion(txDto.getDescripcion());
                     txEntity.setValor(txDto.getValor());
                     txEntity.setCategoria(txDto.getCategoria());
+                    txEntity.setFecha(txReq.getFecha());
+                    txEntity.setAnalisisFinanciero(entidadAnalisis); // ASIGNAR LA RELACIÓN BIDIRECCIONAL
 
                     entidadAnalisis.getTransacciones().add(txEntity);
                 }
@@ -155,11 +160,16 @@ public class CsvService {
                 entidadAnalisis.setSaldoTotal(saldoTotalCalculado);
 
                 List<TransaccionEntity> listaTransaccionesEntities = new ArrayList<>();
-                for (TransaccionResponse txDto : transaccionesCategorizadas) {
+                for (int i = 0; i < transaccionesCategorizadas.size(); i++) {
+                    TransaccionResponse txDto = transaccionesCategorizadas.get(i);
+                    TransaccionRequest txReq = transacciones.get(i);
+
                     TransaccionEntity txEntity = new TransaccionEntity();
                     txEntity.setDescripcion(txDto.getDescripcion());
                     txEntity.setValor(txDto.getValor());
                     txEntity.setCategoria(txDto.getCategoria());
+                    txEntity.setFecha(txReq.getFecha());
+                    txEntity.setAnalisisFinanciero(entidadAnalisis); // ASIGNAR LA RELACIÓN BIDIRECCIONAL
 
                     listaTransaccionesEntities.add(txEntity);
                 }

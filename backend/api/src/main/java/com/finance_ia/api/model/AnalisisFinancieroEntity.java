@@ -19,8 +19,7 @@ public class AnalisisFinancieroEntity {
     private double probabilidad;
     private Double saldoTotal;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "analisis_financiero_id") // Crea la llave foránea en la tabla de transacciones
+    @OneToMany(mappedBy = "analisisFinanciero", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TransaccionEntity> transacciones;
 
     // --- GETTERS Y SETTERS ---
@@ -28,7 +27,6 @@ public class AnalisisFinancieroEntity {
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
@@ -36,7 +34,6 @@ public class AnalisisFinancieroEntity {
     public String getUsuarioNombre() {
         return usuarioNombre;
     }
-
     public void setUsuarioNombre(String usuarioNombre) {
         this.usuarioNombre = usuarioNombre;
     }
@@ -44,7 +41,6 @@ public class AnalisisFinancieroEntity {
     public double getIngresoMensual() {
         return ingresoMensual;
     }
-
     public void setIngresoMensual(double ingresoMensual) {
         this.ingresoMensual = ingresoMensual;
     }
@@ -52,7 +48,6 @@ public class AnalisisFinancieroEntity {
     public double getNivelEndeudamiento() {
         return nivelEndeudamiento;
     }
-
     public void setNivelEndeudamiento(double nivelEndeudamiento) {
         this.nivelEndeudamiento = nivelEndeudamiento;
     }
@@ -60,7 +55,6 @@ public class AnalisisFinancieroEntity {
     public String getFrecuenciaAhorro() {
         return frecuenciaAhorro;
     }
-
     public void setFrecuenciaAhorro(String frecuenciaAhorro) {
         this.frecuenciaAhorro = frecuenciaAhorro;
     }
@@ -68,7 +62,6 @@ public class AnalisisFinancieroEntity {
     public String getPerfilFinanciero() {
         return perfilFinanciero;
     }
-
     public void setPerfilFinanciero(String perfilFinanciero) {
         this.perfilFinanciero = perfilFinanciero;
     }
@@ -76,7 +69,6 @@ public class AnalisisFinancieroEntity {
     public double getProbabilidad() {
         return probabilidad;
     }
-
     public void setProbabilidad(double probabilidad) {
         this.probabilidad = probabilidad;
     }
@@ -84,12 +76,10 @@ public class AnalisisFinancieroEntity {
     public List<TransaccionEntity> getTransacciones() {
         return transacciones;
     }
-
     public void setTransacciones(List<TransaccionEntity> transacciones) {
         this.transacciones = transacciones;
     }
 
     public Double getSaldoTotal() { return saldoTotal; }
-
     public void setSaldoTotal(Double saldoTotal) { this.saldoTotal = saldoTotal; }
 }
