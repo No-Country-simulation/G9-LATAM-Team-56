@@ -116,12 +116,11 @@ function Login() {
               {errorMessage}
             </p>
           )}
-
-          <div className="form-links">
+          {/*<div className="form-links">
             <a href="#">Olvidé mi contraseña</a>
             <span className="divider"></span>
             <a href="#">Crear cuenta</a>
-          </div>
+          </div>*/}
         </div>
       </div>
     </div>
