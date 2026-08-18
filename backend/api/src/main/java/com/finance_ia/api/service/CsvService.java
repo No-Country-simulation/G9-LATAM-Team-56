@@ -130,6 +130,7 @@ public class CsvService {
                 entidadAnalisis.setPerfilFinanciero(perfilResponse.getPerfil_financiero());
                 entidadAnalisis.setProbabilidad(perfilResponse.getProbabilidad());
                 entidadAnalisis.setSaldoTotal(saldoTotalCalculado);
+                entidadAnalisis.setGastoTotal(gastoTotal);
 
                 // Vaciamos la lista existente y añadimos los nuevos elementos
                 entidadAnalisis.getTransacciones().clear();
@@ -158,6 +159,7 @@ public class CsvService {
                 entidadAnalisis.setPerfilFinanciero(perfilResponse.getPerfil_financiero());
                 entidadAnalisis.setProbabilidad(perfilResponse.getProbabilidad());
                 entidadAnalisis.setSaldoTotal(saldoTotalCalculado);
+                entidadAnalisis.setGastoTotal(gastoTotal);
 
                 List<TransaccionEntity> listaTransaccionesEntities = new ArrayList<>();
                 for (int i = 0; i < transaccionesCategorizadas.size(); i++) {
