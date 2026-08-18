@@ -2,6 +2,7 @@ package com.finance_ia.api.controller;
 
 import com.finance_ia.api.dto.recommendation.RecommendationRequestDto;
 import com.finance_ia.api.dto.recommendation.RecommendationResponseDto;
+import com.finance_ia.api.dto.recommendation.RecommendationResult;
 import com.finance_ia.api.dto.recommendation.TopCategoryDto;
 import com.finance_ia.api.model.recommendation.RecommendationRequest;
 import com.finance_ia.api.model.recommendation.RecommendationResponse;
@@ -67,10 +68,18 @@ public class RecommendationController {
         );
     }
 
-    private RecommendationResponseDto toDto(RecommendationResponse response) {
+    private RecommendationResponseDto toDto(
+            RecommendationResponse response
+    ) {
+
+        List<String> recomendaciones =
+                response.recommendations()
+                        .stream()
+                        .map(RecommendationResult::recommendation)
+                        .toList();
 
         return new RecommendationResponseDto(
-                response.recommendations()
+                recomendaciones
         );
     }
 }

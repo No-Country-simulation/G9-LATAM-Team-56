@@ -4,6 +4,7 @@ import axios from 'axios';
 const API_URL = 'http://localhost:8080/api/csv';
 const AUTH_URL = 'http://localhost:8080/api/auth';
 const PERFIL_URL = 'http://localhost:8080/api/perfil';
+const DASHBOARD_URL = 'http://localhost:8080/api/dashboard';
 
 export const uploadCsvFile = async (file, usuario) => {
   // Creamos un objeto FormData para enviar archivos y texto juntos
@@ -32,5 +33,21 @@ export const obtenerDatosPerfil = async (email) => {
     return response.data; // Retorna el JSON con moneda, ingresoMensual, saldoTotal, etc.
   } catch (error) {
     throw new Error(error.response?.data?.error || 'Error al obtener los datos del perfil');
+  }
+};
+
+export const obtenerDashboard = async (usuarioNombre) => {
+  try {
+    const response = await axios.get(
+      `${DASHBOARD_URL}/${encodeURIComponent(usuarioNombre)}`
+    );
+
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      'Error al obtener los datos del dashboard'
+    );
   }
 };

@@ -74,8 +74,8 @@ body {
 /* ==========================================
    3. BARRA LATERAL (SIDEBAR)
    ========================================== */
-.dashboard-layout > aside,
-.dashboard-layout > .sidebar {
+.dashboard-layout>aside,
+.dashboard-layout>.sidebar {
   flex-shrink: 0 !important;
 }
 
@@ -126,24 +126,29 @@ body {
    ========================================== */
 .dashboard-hero {
   text-align: center;
-  padding: 20px 20px 10px;
+  padding: 24px 20px 12px;
   min-width: 0;
 }
 
 .dashboard-hero h1 {
   font-family: 'Arimo', sans-serif;
-  font-size: 32px;
-  font-weight: 400;
+  font-size: 28px;
+  font-weight: 700;
+  /* Peso bold para mayor impacto */
+  letter-spacing: -0.02em;
   margin: 0 0 4px 0;
-  color: var(--color-text-light);
+  color: #ffffff;
+  /* Blanco puro para destacar sobre el azul marino */
 }
 
 .dashboard-hero h2 {
-  font-family: 'Arimo', sans-serif;
-  font-size: 20px;
+  font-family: 'Carlito', sans-serif;
+  font-size: 15px;
   font-weight: 400;
-  color: var(--color-text-light);
+  color: #94a3b8;
+  /* Gris/azul suave para marcar la jerarquía visual */
   margin: 0;
+  letter-spacing: 0.02em;
 }
 
 /* ==========================================
@@ -161,7 +166,7 @@ body {
   box-sizing: border-box !important;
 }
 
-.dashboard-grid > * {
+.dashboard-grid>* {
   min-width: 0;
   max-width: 100%;
 }
@@ -176,7 +181,8 @@ body {
   flex-direction: column;
   justify-content: space-between;
   gap: 20px;
-  height: 100%; /* Ocupa el alto total del grid */
+  height: 100%;
+  /* Ocupa el alto total del grid */
 }
 
 .dashboard-center-column .card-container {
@@ -335,7 +341,9 @@ body {
   justify-content: space-between;
   text-align: center;
   font-family: 'Carlito', sans-serif;
+  gap: 10px;
 }
+
 
 .kpi-blue-button span {
   color: var(--bg-white) !important;
@@ -358,7 +366,8 @@ body {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  color: var(--color-primary) !important; /* Ícono azul oscuro */
+  color: var(--color-primary) !important;
+  /* Ícono azul oscuro */
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
   flex-shrink: 0 !important;
 }
@@ -382,126 +391,127 @@ body {
 /* ==========================================
    12. TABLA Y LISTA DE TRANSACCIONES
    ========================================== */
+/* Contenedor principal de la lista */
 .transactions-list {
+  flex: 1;
   width: 100%;
-  padding: 10px 12px;
+  padding: 12px 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   min-width: 0;
-  max-height: 100px;
+  max-height: 220px;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
 .transactions-list::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 .transactions-list::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
+  background: #f1f5f9;
+  border-radius: 8px;
 }
 
 .transactions-list::-webkit-scrollbar-thumb {
-  background: var(--color-primary);
-  border-radius: 10px;
+  background: #cbd5e1;
+  border-radius: 8px;
 }
 
+/* Forzamos alineación exacta de columnas */
 .tx-header,
 .transaction-item {
   display: grid;
-  grid-template-columns: 2.2fr 2.5fr 2fr;
+  grid-template-columns: 1.2fr 2.5fr 1fr;
   align-items: center;
   width: 100%;
-  min-width: 0;
-  gap: 4px;
+  box-sizing: border-box;
 }
 
-.tx-header {
-  font-family: 'Arimo', sans-serif;
-  font-size: 14px;
+.tx-header-cat,
+.tx-header-val,
+.tx-header-fech {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #006699;
-  border-bottom: 1px solid #e0f4fc;
+  color: var(--text-secondary, #64748b);
+  border-bottom: 1px solid #e2e8f0;
   padding-bottom: 4px;
-  margin-bottom: 4px;
 }
 
-.tx-header > span:first-child {
-  text-align: left;
-}
-
+/* Compensamos los 20px del ícono + 10px de gap para alinear CATEGORÍA con el texto */
 .tx-header-cat {
   text-align: left;
-  padding-left: 4px;
+  padding-left: 30px;
 }
 
+/* Pegamos VALOR completamente a la derecha */
 .tx-header-val {
   text-align: right;
+  justify-self: end;
+  width: 100%;
 }
 
+/* Filas de transacciones */
 .transaction-item {
-  font-family: 'Carlito', sans-serif;
-  font-size: 16px;
-  color: #2c3e50;
-  padding: 6px 0;
+  font-size: 14px;
+  color: var(--text-primary, #1e293b);
+  padding: 4px 0;
 }
 
+.tx-date {
+  color: var(--text-secondary, #64748b);
+  font-size: 13px;
+}
+
+/* Celda de Categoría + Descripción */
 .tx-info {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 6px;
-  padding-left: 4px;
-  width: 100%;
+  gap: 10px;
   min-width: 0;
-  overflow: hidden;
 }
 
 .tx-icon {
-  color: var(--color-primary);
+  color: var(--accent-primary, #1e6091);
   flex-shrink: 0;
-  width: 16px;
   display: flex;
+  align-items: center;
   justify-content: center;
 }
 
-.tx-info span {
+.tx-description {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
+  line-height: 1.2;
+}
+
+.tx-description span {
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
+.tx-description small {
+  font-size: 12px;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Monto alineado a la derecha */
 .tx-amount {
-  font-weight: 600;
-  color: #0b2239;
+  font-weight: 700;
+  color: #0f172a;
   text-align: right;
   white-space: nowrap;
-  min-width: 0;
-  width: 100%;
-}
-
-/* Ajuste de estiramiento para la tarjeta de transacciones */
-.dashboard-center-column .card-container:last-child {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.transactions-list {
-  flex: 1;
-  width: 100%;
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-  max-height: 180px;
-  overflow-y: auto;
-  overflow-x: hidden;
 }
 
 /* ==========================================
@@ -601,6 +611,7 @@ body {
 .btn-green-full:active {
   transform: scale(0.98) !important;
 }
+
 
 /* ==========================================
    14. RESPONSIVIDAD (BREAKPOINTS)

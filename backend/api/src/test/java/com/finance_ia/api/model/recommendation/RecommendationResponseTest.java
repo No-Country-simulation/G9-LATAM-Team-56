@@ -1,5 +1,6 @@
 package com.finance_ia.api.model.recommendation;
 
+import com.finance_ia.api.dto.recommendation.RecommendationResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -14,9 +15,15 @@ class RecommendationResponseTest {
     @DisplayName("Debe crear una respuesta válida con una lista de recomendaciones")
     void shouldCreateResponseWithRecommendations() {
 
-        List<String> recommendations = List.of(
-                "Revisar gastos de restaurante.",
-                "Optimizar gastos de transporte."
+        List<RecommendationResult> recommendations = List.of(
+                new RecommendationResult(
+                        ExpenseCategory.RESTAURANT,
+                        "Revisar gastos de restaurante."
+                ),
+                new RecommendationResult(
+                        ExpenseCategory.TRANSPORTE,
+                        "Optimizar gastos de transporte."
+                )
         );
 
         RecommendationResponse response =
@@ -54,17 +61,23 @@ class RecommendationResponseTest {
     @DisplayName("Debe proteger la lista de recomendaciones contra modificaciones externas (Inmutabilidad)")
     void shouldProtectRecommendationsFromExternalModification() {
 
-        List<String> recommendations = new ArrayList<>();
+        List<RecommendationResult> recommendations = new ArrayList<>();
 
         recommendations.add(
-                "Revisar gastos de restaurante."
+                new RecommendationResult(
+                        ExpenseCategory.RESTAURANT,
+                        "Revisar gastos de restaurante."
+                )
         );
 
         RecommendationResponse response =
                 new RecommendationResponse(recommendations);
 
         recommendations.add(
-                "Optimizar gastos de transporte."
+                new RecommendationResult(
+                        ExpenseCategory.TRANSPORTE,
+                        "Optimizar gastos de transporte."
+                )
         );
 
         assertEquals(

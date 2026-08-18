@@ -70,13 +70,17 @@ class RecommendationServiceAllRulesTest {
                 );
 
                 assertNotNull(
-                        response.recommendations().get(0),
+                        response.recommendations()
+                                .get(0)
+                                .recommendation(),
                         "La recomendación no debería ser null para "
                                 + category + " + " + profile
                 );
 
                 assertFalse(
-                        response.recommendations().get(0).isBlank(),
+                        response.recommendations()
+                                .get(0)
+                                .recommendation().isBlank(),
                         "La recomendación no debería estar vacía para "
                                 + category + " + " + profile
                 );

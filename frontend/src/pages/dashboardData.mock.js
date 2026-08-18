@@ -52,10 +52,19 @@ export const obtenerEstadoSalud = (score = 0) => {
 
 // Paleta de colores para gráficos Recharts (Definitivo)
 export const COLORS_GASTOS = [
-  "#004D40", "#005F87", "#B7791F", "#00695C",
-  "#A83232", "#2E6238", "#0277BD", "#00796B",
-  "#00838F", "#546E7A", "#424242"
+  "#0088FE", // Azul principal
+  "#00C49F", // Verde menta
+  "#FFBB28", // Amarillo mostaza
+  "#FF8042", // Naranja vibrante
+  "#A4DE6C", // Verde lima
+  "#8884D8", // Morado lavanda
+  "#82CA9D", // Verde suave
+  "#FF6584", // Rosa coral
+  "#4BC0C0", // Turquesa
+  "#9966FF", // Violeta
+  "#C9CBCF"  // Gris neutro (ideal para la categoría "Otros")
 ];
+
 
 // DATOS MOCK TEMPORALES (Sustituir con llamadas API)
 
@@ -114,3 +123,35 @@ export const RECOMENDACIONES_MOCK = [
     texto: "Aumentar la reserva financiera mensual"
   }
 ];
+
+export const obtenerGaugeData = (perfil) => {
+  switch (perfil?.trim().toLowerCase()) {
+    case "saludable":
+      return [
+        { name: "En riesgo", value: 20, color: "#990000" },
+        { name: "En observación", value: 30, color: "#D97706" },
+        { name: "Saludable", value: 50, color: "#2D6A4F" },
+      ];
+
+    case "en observación":
+      return [
+        { name: "En riesgo", value: 30, color: "#990000" },
+        { name: "En observación", value: 40, color: "#D97706" },
+        { name: "Saludable", value: 30, color: "#2D6A4F" },
+      ];
+
+    case "en riesgo":
+      return [
+        { name: "En riesgo", value: 50, color: "#990000" },
+        { name: "En observación", value: 30, color: "#D97706" },
+        { name: "Saludable", value: 20, color: "#2D6A4F" },
+      ];
+
+    default:
+      return [
+        { name: "En riesgo", value: 33.33, color: "#990000" },
+        { name: "En observación", value: 33.33, color: "#D97706" },
+        { name: "Saludable", value: 33.34, color: "#2D6A4F" },
+      ];
+  }
+};
