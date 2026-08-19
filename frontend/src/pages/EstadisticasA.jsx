@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { Icon } from "@iconify/react";
 import {
   LineChart,
@@ -11,61 +12,198 @@ import {
 } from "recharts";
 import Sidebar from "../components/Sidebar";
 import UserBadge from "../components/UserBadge";
-import flechaUp from "../assets/img/flecha-up.svg";
-import flechaDown from "../assets/img/flecha-down.svg";
 import "./EstadisticasA.css";
 
-const dataPorRango = {
-  hoy: [
-    { name: "8am", valor: 20 },
-    { name: "12pm", valor: 45 },
-    { name: "4pm", valor: 30 },
-    { name: "8pm", valor: 60 },
-  ],
-  semana: [
-    { name: "Lun", valor: 120 },
-    { name: "Mar", valor: 90 },
-    { name: "Mie", valor: 150 },
-    { name: "Jue", valor: 80 },
-    { name: "Vie", valor: 200 },
-    { name: "Sab", valor: 170 },
-    { name: "Dom", valor: 60 },
-  ],
-  mes: [
-    { name: "Sem 1", valor: 400 },
-    { name: "Sem 2", valor: 300 },
-    { name: "Sem 3", valor: 500 },
-    { name: "Sem 4", valor: 480 },
-  ],
-  anio: [
-    { name: "Ene", valor: 1200 },
-    { name: "Feb", valor: 1500 },
-    { name: "Mar", valor: 1100 },
-    { name: "Abr", valor: 1800 },
-    { name: "May", valor: 1600 },
-    { name: "Jun", valor: 2000 },
-  ],
-};
-
-const resumenCards = [
-  { label: "Ingresos", valor: "$2,000", variacion: "13%", tendencia: "up" },
-  { label: "Gastos", valor: "$1,680", variacion: "8%", tendencia: "down" },
-  { label: "Ahorro", valor: "$750", variacion: "20%", tendencia: "up" },
-];
-
 function EstadisticasA() {
-  const [rango, setRango] = useState("hoy");
-  const [periodo, setPeriodo] = useState("mes");
-  const [fechaInicio, setFechaInicio] = useState("2026-07-01");
-  const [fechaFin, setFechaFin] = useState("2026-08-01");
-  const [mostrarFechas, setMostrarFechas] = useState(false);
+  // Usuario autenticado real
+  const usuarioActual = localStorage.getItem("usuarioNombre") || sessionStorage.getItem("usuarioNombre") || "Invitado";
 
-  const rangos = [
+  // ESTADOS EXCLUSIVOS PARA LAS TARJETAS (Filtro Superior)
+  const [periodoFiltro, setPeriodoFiltro] = useState("semana");
+  const [fechaInicioFiltro, setFechaInicioFiltro] = useState("");
+  const [fechaFinFiltro, setFechaFinFiltro] = useState("");
+  const [topCategorias, setTopCategorias] = useState([]);
+
+  // ESTADOS EXCLUSIVOS PARA EL GRÁFICO (Botones: HOY por defecto)
+  const [rangoGrafico, setRangoGrafico] = useState("hoy");
+  const [datosGrafico, setDatosGrafico] = useState([]);
+
+  const rangosBotones = [
     { key: "hoy", label: "HOY" },
     { key: "semana", label: "SEMANA" },
     { key: "mes", label: "MES" },
     { key: "anio", label: "AÑO" },
   ];
+
+  // FUNCIÓN PARA ASIGNAR UN ICONO SEGÚN LA CATEGORÍA
+  const obtenerIconoCategoria = (nombreCategoria) => {
+    if (!nombreCategoria) return "mdi:tag-outline";
+    const cat = nombreCategoria.toLowerCase();
+
+    if (cat.includes("vivienda")) {return "mdi:mdi:home-outline";}
+    if (cat.includes("servicios")) {return "mdi:lightning-bolt-outline"}
+    if (cat.includes("alimentacion")) {return "mdi:cart-outline";}
+    if (cat.includes("transporte")) {return "mdi:car-outline";}
+    if (cat.includes("restaurant")) {return "mdi:silverware-fork-knife";}
+    if (cat.includes("entretenimiento")) {return "mdi:movie-open-outline";}
+    if (cat.includes("vestuario")) {return "mdi:tshirt-crew-outline";}
+    if (cat.includes("electronicos")) {return "mdi:laptop";}
+    if (cat.includes("salud")) {return "mdi:hospital-box-outline";}
+    if (cat.includes("educacion")) {return "mdi:school-outline";}
+    if (cat.includes("otros")) {return "mdi:dots-horizontal-circle-outline";}
+
+    return "mdi:tag-outline"; // Icono por defecto
+  };
+
+  // =============================
+  //  TARJETAS (Filtro Superior)
+  // =============================
+  useEffect(() => {
+    const ahora = new Date();
+    let inicio = new Date();
+    let fin = new Date();
+
+    if (periodoFiltro === "semana") {
+      const diaSemana = ahora.getDay();
+      const diffToMonday = ahora.getDate() - diaSemana + (diaSemana === 0 ? -6 : 1);
+      inicio = new Date(ahora.setDate(diffToMonday));
+      fin = new Date();
+    } else if (periodoFiltro === "mes") {
+      inicio = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+      fin = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0);
+    } else if (periodoFiltro === "trimestre") {
+      inicio = new Date(ahora.getFullYear(), ahora.getMonth() - 3, 1);
+      fin = new Date();
+    } else if (periodoFiltro === "anio") {
+      inicio = new Date(ahora.getFullYear(), 0, 1);
+      fin = new Date(ahora.getFullYear(), 11, 31);
+    }
+
+    setFechaInicioFiltro(inicio.toISOString().split("T")[0]);
+    setFechaFinFiltro(fin.toISOString().split("T")[0]);
+  }, [periodoFiltro]);
+
+  useEffect(() => {
+    if (!fechaInicioFiltro || !fechaFinFiltro || usuarioActual === "Invitado") return;
+
+    const cargarTarjetas = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8080/api/estadisticas`, {
+          params: { usuario: usuarioActual, inicio: fechaInicioFiltro, fin: fechaFinFiltro }
+        });
+        setTopCategorias(res.data.top3 || []);
+      } catch (error) {
+        console.error("Error al cargar tarjetas:", error);
+      }
+    };
+    cargarTarjetas();
+  }, [fechaInicioFiltro, fechaFinFiltro, usuarioActual]);
+
+  // ==================================
+  //  GRÁFICO (Botones Independientes)
+  // ==================================
+  useEffect(() => {
+    if (usuarioActual === "Invitado") return;
+
+    const cargarGraficoIndependiente = async () => {
+      const hoy = new Date();
+      let inicio = new Date();
+      let fin = new Date(hoy);
+
+      if (rangoGrafico === "hoy") {
+        inicio = hoy;
+        fin = hoy;
+      } else if (rangoGrafico === "semana") {
+        const diaSemana = hoy.getDay();
+        const diffToMonday = hoy.getDate() - diaSemana + (diaSemana === 0 ? -6 : 1);
+        inicio = new Date(new Date().setDate(diffToMonday));
+      } else if (rangoGrafico === "mes") {
+        inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+      } else if (rangoGrafico === "anio") {
+        inicio = new Date(hoy.getFullYear(), 0, 1);
+      }
+
+      const fInicio = inicio.toISOString().split("T")[0];
+      const fFin = fin.toISOString().split("T")[0];
+
+      try {
+        const res = await axios.get(`http://localhost:8080/api/estadisticas`, {
+          params: { usuario: usuarioActual, inicio: fInicio, fin: fFin }
+        });
+
+        const transacciones = res.data.transaccionesDetalladas || [];
+        const datosProcesados = procesarDatosGrafico(transacciones, rangoGrafico, hoy);
+        setDatosGrafico(datosProcesados);
+      } catch (error) {
+        console.error("Error al cargar gráfico:", error);
+      }
+    };
+
+    cargarGraficoIndependiente();
+  }, [rangoGrafico, usuarioActual]);
+
+  const parsearFechaLocal = (fechaStr) => {
+    const [anio, mes, dia] = fechaStr.split("-").map(Number);
+    return new Date(anio, mes - 1, dia);
+  };
+
+  const procesarDatosGrafico = (transacciones, rango, hoy) => {
+    if (!transacciones || transacciones.length === 0) return [];
+    const hoyStr = hoy.toISOString().split("T")[0];
+
+    if (rango === "hoy") {
+      const agrupado = {};
+      transacciones.forEach(item => {
+        if (item.fecha === hoyStr) {
+          const cat = item.categoria || "General";
+          agrupado[cat] = (agrupado[cat] || 0) + item.valor;
+        }
+      });
+      return Object.keys(agrupado).map(cat => ({ name: cat, valor: agrupado[cat] }));
+    }
+
+    if (rango === "semana") {
+      const diasOrdenados = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+      const agrupado = { "Lun": 0, "Mar": 0, "Mié": 0, "Jue": 0, "Vie": 0, "Sáb": 0, "Dom": 0 };
+      transacciones.forEach(item => {
+        const fechaObj = parsearFechaLocal(item.fecha);
+        let jsDay = fechaObj.getDay();
+        const indices = [6, 0, 1, 2, 3, 4, 5];
+        const nombreDia = diasOrdenados[indices[jsDay]];
+        agrupado[nombreDia] += item.valor;
+      });
+      return diasOrdenados.map(dia => ({ name: dia, valor: agrupado[dia] }));
+    }
+
+    if (rango === "mes") {
+      const agrupado = { "Sem 1": 0, "Sem 2": 0, "Sem 3": 0, "Sem 4": 0 };
+      transacciones.forEach(item => {
+        const fechaObj = parsearFechaLocal(item.fecha);
+        const diaMes = fechaObj.getDate();
+        let sem = "Sem 4";
+        if (diaMes <= 7) sem = "Sem 1";
+        else if (diaMes <= 14) sem = "Sem 2";
+        else if (diaMes <= 21) sem = "Sem 3";
+        agrupado[sem] += item.valor;
+      });
+      return Object.keys(agrupado).map(sem => ({ name: sem, valor: agrupado[sem] }));
+    }
+
+    if (rango === "anio") {
+      const mesesNombres = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+      const agrupado = {};
+      mesesNombres.forEach(m => agrupado[m] = 0);
+      transacciones.forEach(item => {
+        const fechaObj = parsearFechaLocal(item.fecha);
+        const mesIndex = fechaObj.getMonth();
+        const mesNombre = mesesNombres[mesIndex];
+        if (mesNombre) agrupado[mesNombre] += item.valor;
+      });
+      return mesesNombres.map(mes => ({ name: mes, valor: agrupado[mes] }));
+    }
+
+    return [];
+  };
 
   return (
     <div className="estadisticas-layout">
@@ -93,10 +231,11 @@ function EstadisticasA() {
                 <span>Filtrar por</span>
               </div>
 
+              {/* Selector exclusivo para las Tarjetas Top 3 */}
               <select
                 className="filtro-pill filtro-select"
-                value={periodo}
-                onChange={(e) => setPeriodo(e.target.value)}
+                value={periodoFiltro}
+                onChange={(e) => setPeriodoFiltro(e.target.value)}
               >
                 <option value="semana">Esta semana</option>
                 <option value="mes">Este mes</option>
@@ -104,42 +243,13 @@ function EstadisticasA() {
                 <option value="anio">Este año</option>
               </select>
 
+              {/* Rango de Fechas visual de las tarjetas */}
               <div className="filtro-fechas-wrapper">
-                <button
-                  className="filtro-pill"
-                  onClick={() => setMostrarFechas(!mostrarFechas)}
-                >
-                  {fechaInicio.slice(5).split("-").reverse().join("/")} -{" "}
-                  {fechaFin.slice(5).split("-").reverse().join("/")}
+                <div className="filtro-pill" style={{ cursor: "default" }}>
+                  {fechaInicioFiltro ? fechaInicioFiltro.split("-").reverse().join("/") : ""} -{" "}
+                  {fechaFinFiltro ? fechaFinFiltro.split("-").reverse().join("/") : ""}
                   <Icon icon="mdi:calendar-month-outline" width="16" />
-                </button>
-
-                {mostrarFechas && (
-                  <div className="filtro-fechas-dropdown">
-                    <label>
-                      Desde
-                      <input
-                        type="date"
-                        value={fechaInicio}
-                        onChange={(e) => setFechaInicio(e.target.value)}
-                      />
-                    </label>
-                    <label>
-                      Hasta
-                      <input
-                        type="date"
-                        value={fechaFin}
-                        onChange={(e) => setFechaFin(e.target.value)}
-                      />
-                    </label>
-                    <button
-                      className="filtro-fechas-aplicar"
-                      onClick={() => setMostrarFechas(false)}
-                    >
-                      Aplicar
-                    </button>
-                  </div>
-                )}
+                </div>
               </div>
             </div>
           </section>
@@ -148,12 +258,13 @@ function EstadisticasA() {
             <div className="grafico-card">
               <h2>EVOLUCIÓN GASTOS</h2>
 
+              {/* Botones exclusivos para el Gráfico */}
               <div className="grafico-tabs">
-                {rangos.map((r) => (
+                {rangosBotones.map((r) => (
                   <button
                     key={r.key}
-                    className={`grafico-tab ${rango === r.key ? "active" : ""}`}
-                    onClick={() => setRango(r.key)}
+                    className={`grafico-tab ${rangoGrafico === r.key ? "active" : ""}`}
+                    onClick={() => setRangoGrafico(r.key)}
                   >
                     {r.label}
                   </button>
@@ -162,16 +273,9 @@ function EstadisticasA() {
 
               <div className="grafico-chart">
                 <ResponsiveContainer width="100%" height={260}>
-                  <LineChart data={dataPorRango[rango]}>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="var(--neutro-ccc)"
-                    />
-                    <XAxis
-                      dataKey="name"
-                      stroke="var(--neutro-666)"
-                      fontSize={12}
-                    />
+                  <LineChart data={datosGrafico}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--neutro-ccc)" />
+                    <XAxis dataKey="name" stroke="var(--neutro-666)" fontSize={12} />
                     <YAxis stroke="var(--neutro-666)" fontSize={12} />
                     <Tooltip />
                     <Line
@@ -186,42 +290,23 @@ function EstadisticasA() {
               </div>
             </div>
 
+            {/* TARJETAS TOP 3 CATEGORÍAS CON ICONOS */}
             <div className="resumen-cards">
-              {resumenCards.map((card) => (
-                <div className="resumen-card" key={card.label}>
-                  <div
-                    className={`resumen-card-icon ${card.tendencia === "down" ? "negativo" : "positivo"}`}
-                  >
-                    <img
-                      src={card.tendencia === "down" ? flechaDown : flechaUp}
-                      alt={
-                        card.tendencia === "down"
-                          ? "tendencia negativa"
-                          : "tendencia positiva"
-                      }
-                      className="tendencia-icon"
-                    />
-                  </div>
-                  <div className="resumen-card-info">
-                    <p className="resumen-card-label">{card.label}</p>
-                    <p className="resumen-card-valor">{card.valor}</p>
-                    <p className="resumen-card-sub">vs. mes anterior</p>
-                    <div
-                      className={`resumen-card-variacion ${card.tendencia === "down" ? "negativo" : "positivo"}`}
-                    >
-                      <Icon
-                        icon={
-                          card.tendencia === "down"
-                            ? "mdi:trending-down"
-                            : "mdi:trending-up"
-                        }
-                        width="14"
-                      />
-                      <span>{card.variacion}</span>
+              {topCategorias.length > 0 ? (
+                topCategorias.map((card, index) => (
+                  <div className="resumen-card" key={index}>
+                    <div className="resumen-card-icon">
+                      <Icon icon={obtenerIconoCategoria(card.label)} width="24" />
+                    </div>
+                    <div className="resumen-card-info">
+                      <p className="resumen-card-label">{card.label}</p>
+                      <p className="resumen-card-valor">{card.valor}</p>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p style={{ color: "#fff", padding: "10px" }}>No hay datos para este período</p>
+              )}
             </div>
           </section>
         </div>
