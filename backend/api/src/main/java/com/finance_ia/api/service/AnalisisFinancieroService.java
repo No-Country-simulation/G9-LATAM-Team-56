@@ -28,20 +28,37 @@ public class AnalisisFinancieroService {
     private final PerfilFinancieroOnnxService perfilService;
     private final ClasificadorTransaccionesOnnxService transaccionesService;
     private final RecommendationService recommendationService;
+    private final FinancialValidationService validationService;
 
     public AnalisisFinancieroService(
             PerfilFinancieroOnnxService perfilService,
             ClasificadorTransaccionesOnnxService transaccionesService,
-            RecommendationService recommendationService) {
+            RecommendationService recommendationService, FinancialValidationService validationService) {
 
         this.perfilService = perfilService;
         this.transaccionesService = transaccionesService;
         this.recommendationService = recommendationService;
+        this.validationService = validationService;
     }
 
     public AnalisisFinancieroResponse analizar(
             AnalisisFinancieroRequest request
     ) {
+        if (request == null) {
+            throw new IllegalArgumentException(
+                    "La solicitud es obligatoria."
+            );
+        }
+        // Validación antes de ejecutar cualquier modelo
+        validationService.validarDatosFinancieros(
+                request.getIngreso_mensual(),
+                request.getNivel_endeudamiento(),
+                request.getFrecuencia_ahorro()
+        );
+
+        validationService.validarTransacciones(
+                request.getTransacciones()
+        );
 
         // 1. Preparar request para el clasificador de transacciones
         ClasificacionTransaccionesRequest clasificacionRequest

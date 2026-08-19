@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import com.finance_ia.api.dto.recommendation.RecommendationResult;
 import com.finance_ia.api.dto.recommendation.RecommendationResultDto;
+import com.finance_ia.api.infra.exception.CsvValidationException;
+import com.finance_ia.api.infra.exception.ErrorDetail;
 import com.finance_ia.api.model.RecomendacionEntity;
 import com.finance_ia.api.model.recommendation.RecommendationResponse;
 import org.apache.commons.csv.CSVFormat;
@@ -34,18 +36,96 @@ import com.finance_ia.api.repository.AnalisisFinancieroRepository;
 public class CsvService {
 
     private final AnalisisFinancieroService analisisFinancieroService;
-    private final AnalisisFinancieroRepository analisisRepository; // Inyectamos el repositorio de MySQL
+    private final AnalisisFinancieroRepository analisisRepository;
+    private final FinancialValidationService financialValidationService;
+    private static final List<String> COLUMNAS_OBLIGATORIAS = List.of(
+            "ingreso_mensual",
+            "nivel_endeudamiento",
+            "frecuencia_ahorro",
+            "descripcion",
+            "valor",
+            "fecha"
+    );
 
-    // Inyección de dependencias por constructor (Práctica recomendada en Spring Boot)
+    // Inyección de dependencias por constructor
     public CsvService(
             AnalisisFinancieroService analisisFinancieroService,
-            AnalisisFinancieroRepository analisisRepository
+            AnalisisFinancieroRepository analisisRepository, FinancialValidationService financialValidationService
     ) {
         this.analisisFinancieroService = analisisFinancieroService;
         this.analisisRepository = analisisRepository;
+        this.financialValidationService = financialValidationService;
     }
 
     // Modificamos el mtodo para que ahora reciba también el nombre de la persona
+    private void validarColumnas(CSVParser parser) {
+
+        List<ErrorDetail> errors = new ArrayList<>();
+
+        Map<String, Integer> headers = parser.getHeaderMap();
+
+        for (String columna : COLUMNAS_OBLIGATORIAS) {
+
+            if (!headers.containsKey(columna)) {
+
+                errors.add(new ErrorDetail(
+                        columna,
+                        "Falta la columna obligatoria '" + columna + "'.",
+                        null
+                ));
+            }
+        }
+
+        if (!errors.isEmpty()) {
+            throw new CsvValidationException(errors);
+        }
+    }
+
+      private void validarRegistros(
+                List<CSVRecord> records
+        ) {
+
+            List<ErrorDetail> errors =
+                    new ArrayList<>();
+
+            if (records.isEmpty()) {
+
+                errors.add(
+                        new ErrorDetail(
+                                "archivo",
+                                "El archivo CSV debe contener al menos una transacción.",
+                                null
+                        )
+                );
+
+                throw new CsvValidationException(errors);
+            }
+
+            for (CSVRecord record : records) {
+
+                // Se suma 1 porque el número de registro de CSV no representa directamente
+                // el número de línea física del archivo: la primera
+                // fila de datos corresponde a la línea 2, después del encabezado.
+                int row = (int) record.getRecordNumber() + 1;
+
+                errors.addAll(
+                        financialValidationService.validarRegistroCsv(
+                                record.get("ingreso_mensual"),
+                                record.get("nivel_endeudamiento"),
+                                record.get("frecuencia_ahorro"),
+                                record.get("descripcion"),
+                                record.get("valor"),
+                                record.get("fecha"),
+                                row
+                        )
+                );
+            }
+
+            if (!errors.isEmpty()) {
+                throw new CsvValidationException(errors);
+            }
+        }
+        
     public CsvResponse analizarYGuardarCsv(MultipartFile file, String nombreUsuario) {
 
         try (
@@ -62,6 +142,12 @@ public class CsvService {
                         .parse(reader)
         ) {
 
+            // Validamos la estructura y todos los registros antes de iniciar el análisis,
+            // para evitar procesar parcialmente un CSV inválido.
+            validarColumnas(parser);
+            List<CSVRecord> records = parser.getRecords();
+            validarRegistros(records);
+
             List<TransaccionRequest> transacciones = new ArrayList<>();
             double ingresoMensual = 0;
             double nivelEndeudamiento = 0;
@@ -69,7 +155,7 @@ public class CsvService {
             boolean primeraFila = true;
 
             // Recorremos cada línea del archivo CSV
-            for (CSVRecord record : parser) {
+            for (CSVRecord record : records) {
                 if (primeraFila) {
                     ingresoMensual = Double.parseDouble(record.get("ingreso_mensual"));
                     nivelEndeudamiento = Double.parseDouble(record.get("nivel_endeudamiento"));
