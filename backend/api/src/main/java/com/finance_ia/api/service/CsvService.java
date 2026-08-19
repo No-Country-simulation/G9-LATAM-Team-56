@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.finance_ia.api.dto.recommendation.RecommendationResult;
 import com.finance_ia.api.dto.recommendation.RecommendationResultDto;
@@ -86,43 +87,53 @@ public class CsvService {
                 transacciones.add(transaccion);
             }
 
+            // Identificar el último mes presente en el CSV
+            LocalDate fechaMasReciente = transacciones.stream()
+                    .map(TransaccionRequest::getFecha)
+                    .max(LocalDate::compareTo)
+                    .orElse(LocalDate.now());
+            int mesObjetivo = fechaMasReciente.getMonthValue();
+            int anioObjetivo = fechaMasReciente.getYear();
+
+            // Filtrar transacciones solo del último mes encontrado
+            List<TransaccionRequest> transaccionesUltimoMes = transacciones.stream()
+                    .filter(t -> t.getFecha().getMonthValue() == mesObjetivo && t.getFecha().getYear() == anioObjetivo)
+                    .collect(Collectors.toList());
+
             // Clasificar las transacciones llamando al servicio financiero
             ClasificacionTransaccionesRequest clasificacionRequest = new ClasificacionTransaccionesRequest();
             clasificacionRequest.setTransacciones(transacciones);
-
             ClasificacionTransaccionesResponse clasificacionResponse =
                     analisisFinancieroService.clasificarTransacciones(clasificacionRequest);
-
             List<TransaccionResponse> transaccionesCategorizadas =
                     clasificacionResponse.getTransacciones();
 
-            // Calcular el gasto total sumando todas las transacciones
-            double gastoTotal = 0.0;
+            // Calcular Gasto y Saldo SOLO con las transacciones filtradas
+            double gastoTotalUltimoMes = transaccionesUltimoMes.stream()
+                    .mapToDouble(TransaccionRequest::getValor)
+                    .sum();
 
-            Map<String, Double> resumenGastos = new HashMap<>();
+            double saldoTotalUltimoMes = ingresoMensual - gastoTotalUltimoMes;
 
-            for (TransaccionResponse transaccion : transaccionesCategorizadas) {
-
-                double valor = transaccion.getValor();
-
-                gastoTotal += valor;
-
-                resumenGastos.merge(
-                        transaccion.getCategoria(),
-                        valor,
-                        Double::sum
-                );
-            }
-
-            // CALCULAR EL SALDO TOTAL (Ingreso menos la suma de las transacciones)
-            double saldoTotalCalculado = ingresoMensual - gastoTotal;
+            // Agrupar usando las categorías reales ya procesadas
+            Map<String, Double> resumenGastos = transaccionesCategorizadas.stream()
+                    .filter(t -> {
+                        // Filtramos para que coincida con el año y mes del último mes
+                        int mesT = t.getFecha().getMonthValue();
+                        int anioT = t.getFecha().getYear();
+                        return mesT == mesObjetivo && anioT == anioObjetivo;
+                    })
+                    .collect(Collectors.groupingBy(
+                            TransaccionResponse::getCategoria, // Usamos la categoría real del Enum
+                            Collectors.summingDouble(TransaccionResponse::getValor)
+                    ));
 
             // Obtener el perfil financiero del usuario
             PerfilFinancieroRequest perfilRequest = new PerfilFinancieroRequest();
             perfilRequest.setIngreso_mensual(ingresoMensual);
             perfilRequest.setNivel_endeudamiento(nivelEndeudamiento);
             perfilRequest.setFrecuencia_ahorro(frecuenciaAhorro);
-            perfilRequest.setGasto_total(gastoTotal);
+            perfilRequest.setGasto_total(gastoTotalUltimoMes);
 
             PerfilFinancieroResponse perfilResponse =
                     analisisFinancieroService.obtenerPerfil(perfilRequest);
@@ -149,8 +160,8 @@ public class CsvService {
                 entidadAnalisis.setFrecuenciaAhorro(frecuenciaAhorro);
                 entidadAnalisis.setPerfilFinanciero(perfilResponse.getPerfil_financiero());
                 entidadAnalisis.setProbabilidad(perfilResponse.getProbabilidad());
-                entidadAnalisis.setSaldoTotal(saldoTotalCalculado);
-                entidadAnalisis.setGastoTotal(gastoTotal);
+                entidadAnalisis.setSaldoTotal(saldoTotalUltimoMes);
+                entidadAnalisis.setGastoTotal(gastoTotalUltimoMes);
 
                 // Vaciamos la lista existente y añadimos los nuevos elementos
                 entidadAnalisis.getTransacciones().clear();
@@ -188,8 +199,8 @@ public class CsvService {
                 entidadAnalisis.setFrecuenciaAhorro(frecuenciaAhorro);
                 entidadAnalisis.setPerfilFinanciero(perfilResponse.getPerfil_financiero());
                 entidadAnalisis.setProbabilidad(perfilResponse.getProbabilidad());
-                entidadAnalisis.setSaldoTotal(saldoTotalCalculado);
-                entidadAnalisis.setGastoTotal(gastoTotal);
+                entidadAnalisis.setSaldoTotal(saldoTotalUltimoMes);
+                entidadAnalisis.setGastoTotal(gastoTotalUltimoMes);
 
                 List<TransaccionEntity> listaTransaccionesEntities = new ArrayList<>();
                 for (int i = 0; i < transaccionesCategorizadas.size(); i++) {
