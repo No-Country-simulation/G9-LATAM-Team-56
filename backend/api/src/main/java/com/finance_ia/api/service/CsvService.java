@@ -6,10 +6,12 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
+import com.finance_ia.api.dto.recommendation.RecommendationResult;
+import com.finance_ia.api.dto.recommendation.RecommendationResultDto;
+import com.finance_ia.api.model.RecomendacionEntity;
+import com.finance_ia.api.model.recommendation.RecommendationResponse;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -96,8 +98,20 @@ public class CsvService {
 
             // Calcular el gasto total sumando todas las transacciones
             double gastoTotal = 0.0;
+
+            Map<String, Double> resumenGastos = new HashMap<>();
+
             for (TransaccionResponse transaccion : transaccionesCategorizadas) {
-                gastoTotal += transaccion.getValor();
+
+                double valor = transaccion.getValor();
+
+                gastoTotal += valor;
+
+                resumenGastos.merge(
+                        transaccion.getCategoria(),
+                        valor,
+                        Double::sum
+                );
             }
 
             // CALCULAR EL SALDO TOTAL (Ingreso menos la suma de las transacciones)
@@ -112,6 +126,12 @@ public class CsvService {
 
             PerfilFinancieroResponse perfilResponse =
                     analisisFinancieroService.obtenerPerfil(perfilRequest);
+
+            RecommendationResponse recommendationResponse =
+                    analisisFinancieroService.generarRecomendaciones(
+                            perfilResponse.getPerfil_financiero(),
+                            resumenGastos
+                    );
 
             // =========================================================================
             // GUARDAR O ACTUALIZAR EN LA BASE DE DATOS MYSQL (Evita duplicados)
@@ -135,6 +155,12 @@ public class CsvService {
                 // Vaciamos la lista existente y añadimos los nuevos elementos
                 entidadAnalisis.getTransacciones().clear();
 
+                entidadAnalisis.getRecomendaciones().clear();
+                agregarRecomendaciones(
+                        entidadAnalisis,
+                        recommendationResponse
+                );
+
                 for (int i = 0; i < transaccionesCategorizadas.size(); i++) {
                     TransaccionResponse txDto = transaccionesCategorizadas.get(i);
                     TransaccionRequest txReq = transacciones.get(i); // Obtenemos la fecha original del CSV
@@ -152,6 +178,10 @@ public class CsvService {
             } else {
                 // SI NO EXISTE -> Creamos un objeto completamente nuevo
                 entidadAnalisis = new AnalisisFinancieroEntity();
+                agregarRecomendaciones(
+                        entidadAnalisis,
+                        recommendationResponse
+                );
                 entidadAnalisis.setUsuarioNombre(nombreUsuario);
                 entidadAnalisis.setIngresoMensual(ingresoMensual);
                 entidadAnalisis.setNivelEndeudamiento(nivelEndeudamiento);
@@ -190,11 +220,52 @@ public class CsvService {
             response.setPerfil_financiero(perfilResponse.getPerfil_financiero());
             response.setProbabilidad(perfilResponse.getProbabilidad());
             response.setTransacciones(transaccionesCategorizadas);
+            response.setRecomendaciones(
+                    recommendationResponse.recommendations()
+                            .stream()
+                            .map(result ->
+                                    new RecommendationResultDto(
+                                            result.category().name(),
+                                            result.recommendation()
+                                    )
+                            )
+                            .toList()
+            );
+
 
             return response;
 
         } catch (IOException e) {
             throw new IllegalArgumentException("No se pudo leer el archivo CSV", e);
+        }
+    }
+
+    private void agregarRecomendaciones(
+            AnalisisFinancieroEntity entidadAnalisis,
+            RecommendationResponse recommendationResponse
+    ) {
+
+        for (RecommendationResult result :
+                recommendationResponse.recommendations()) {
+
+            RecomendacionEntity recomendacion =
+                    new RecomendacionEntity();
+
+            recomendacion.setCategoria(
+                    result.category().name()
+            );
+
+            recomendacion.setMensaje(
+                    result.recommendation()
+            );
+
+            recomendacion.setAnalisisFinanciero(
+                    entidadAnalisis
+            );
+
+            entidadAnalisis
+                    .getRecomendaciones()
+                    .add(recomendacion);
         }
     }
 }

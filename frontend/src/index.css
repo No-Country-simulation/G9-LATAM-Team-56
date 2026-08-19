@@ -14,3 +14,13 @@ body {
   height: 100%;
   width: 100%;
 }
+
+/* Quita el borde/recuadro de enfoque de los SVG y sectores en Recharts */
+.recharts-wrapper *:focus,
+.recharts-surface *:focus,
+.recharts-sector:focus,
+.recharts-pie-sector:focus,
+.recharts-active-shape:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}

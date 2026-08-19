@@ -9,17 +9,18 @@ import { GraficoGastos } from "../components/GraficoGastos";
 import {
   COLORS_GASTOS,
   obtenerIconoCategoria,
-  obtenerEstadoSalud
+  obtenerEstadoSalud,
+  obtenerGaugeData
 } from "./dashboardData.mock";
+
+import { useEffect, useState } from "react";
+import { obtenerDashboard } from "../../services/api";
 
 // Datos de prueba (sustituir por llamados Axios/Fetch a la API de Spring Boot)
 import {
-  GAUGE_MOCK,
-  KPIS_MOCK,
-  GASTOS_MOCK,
-  TRANSACCIONES_MOCK,
-  RECOMENDACIONES_MOCK,
+  GAUGE_MOCK
 } from "./dashboardData.mock";
+
 
 
 // Helper para dar formato a la fecha
@@ -36,13 +37,119 @@ const formatearFecha = (fechaStr) => {
 //-------------------------------------------------------------------------------------------------
 
 function Dashboard() {
-  const estadoSalud = obtenerEstadoSalud(GAUGE_MOCK.scoreValue);
-  const navigate = useNavigate(); // Inicializar la función de navegación
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Función que maneja el evento al hacer clic en el botón
-    const handleVerDetalle = () => {
-        navigate("/recomendaciones");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const cargarDashboard = async () => {
+      try {
+        const usuario = localStorage.getItem("usuarioNombre");
+
+        if (!usuario) {
+          throw new Error("No se encontró el usuario");
+        }
+
+        const data = await obtenerDashboard(usuario);
+
+        // Solo actualizar el estado si el componente sigue montado
+        if (isMounted) {
+          setDashboardData(data);
+        }
+      } catch (err) {
+        console.error("Error al cargar dashboard:", err);
+        if (isMounted) {
+          setError(err.message);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    cargarDashboard();
+
+    // Función de limpieza
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  if (loading) {
+    return <div>Cargando dashboard...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (!dashboardData) {
+    return <div>No hay datos disponibles.</div>;
+  }
+  console.log("DATOS DEL DASHBOARD:", dashboardData);
+
+  const obtenerEstadoSalud = (perfil = "") => {
+    const perfilLimpio = perfil.trim().toLowerCase();
+
+    if (perfilLimpio === "saludable") {
+      return {
+        texto: "Saludable",
+        claseCss: "status-good"
       };
+    }
+
+    if (
+      perfilLimpio === "en observación" ||
+      perfilLimpio === "en observacion"
+    ) {
+      return {
+        texto: "En Observación",
+        claseCss: "status-warning"
+      };
+    }
+
+    if (
+      perfilLimpio === "en riesgo" ||
+      perfilLimpio === "riesgo"
+    ) {
+      return {
+        texto: "En Riesgo",
+        claseCss: "status-bad"
+      };
+    }
+
+    return {
+      texto: "Sin determinar",
+      claseCss: ""
+    };
+  };
+
+  const estadoSalud = obtenerEstadoSalud(
+    dashboardData.perfil_financiero
+  );
+
+  const gaugeData = obtenerGaugeData(
+    dashboardData.perfil_financiero
+  );
+
+  const handleVerDetalle = () => {
+    navigate("/recomendaciones");
+  };
+
+  const gastosGrafico =
+    Object.entries(
+      dashboardData.resumen_gastos
+    ).map(([categoria, monto]) => ({
+      categoria,
+      monto
+    }));
+
+
 
   return (
     <div className="dashboard-layout">
@@ -76,16 +183,16 @@ function Dashboard() {
                 </header>
 
                 <PieChartWithNeedle
-                  scoreValue={GAUGE_MOCK.scoreValue}
-                  gaugeData={GAUGE_MOCK.gaugeData}
+                  scoreValue={dashboardData.probabilidad * 100}
+                  gaugeData={gaugeData}
                 />
               </div>
 
               <div className="profile-bottom-section">
                 <div className="score-section">
-                  <h3>Score: {GAUGE_MOCK.scoreValue}/100</h3>
+                  <h3>SALUD FINANCIERA</h3>
+
                   <p>
-                    Tu salud es:{" "}
                     <span className={estadoSalud.claseCss}>
                       {estadoSalud.texto}
                     </span>
@@ -97,24 +204,30 @@ function Dashboard() {
                     <div className="kpi-icon-badge">
                       <Icon icon="mdi:account-reactivate" width="24" aria-hidden="true" />
                     </div>
-                    <span>Perfil:</span>
-                    <strong>{KPIS_MOCK.perfil}</strong>
+                    <span>Perfil</span>
+                    <strong>
+                      {dashboardData.perfil_financiero}
+                    </strong>
                   </div>
 
                   <div className="kpi-blue-button">
                     <div className="kpi-icon-badge">
                       <Icon icon="ph:chart-pie-fill" width="24" aria-hidden="true" />
                     </div>
-                    <span>Probabilidad:</span>
-                    <strong>{KPIS_MOCK.probabilidad}%</strong>
+                    <span>Probabilidad</span>
+                    <strong>
+                      {(dashboardData.probabilidad * 100).toFixed(1)}%
+                    </strong>
                   </div>
 
                   <div className="kpi-blue-button">
                     <div className="kpi-icon-badge">
-                      <Icon icon="mdi:sack-percent" width="24" aria-hidden="true" />
+                      <Icon icon="mdi:sack-percent" width="22" aria-hidden="true" />
                     </div>
-                    <span>Nivel de endeudamiento:</span>
-                    <strong>{KPIS_MOCK.endeudamiento}%</strong>
+                    <span>Endeudamiento</span>
+                    <strong>
+                      {dashboardData.nivel_endeudamiento}%
+                    </strong>
                   </div>
                 </div>
               </div>
@@ -127,7 +240,10 @@ function Dashboard() {
                   <h3>RESUMEN DE GASTOS</h3>
                 </header>
 
-                <GraficoGastos datos={GASTOS_MOCK} colores={COLORS_GASTOS} />
+                <GraficoGastos
+                  datos={gastosGrafico}
+                  colores={COLORS_GASTOS}
+                />
               </article>
 
               <article className="card-container">
@@ -135,37 +251,47 @@ function Dashboard() {
                   <h3>TRANSACCIONES RECIENTES</h3>
                 </header>
 
-                <div className="transactions-list" role="table" aria-label="Transacciones recientes">
-                  <div className="tx-header transaction-item" role="row">
-                    <span role="columnheader">Fecha</span>
+                <div
+                  className="transactions-list"
+                  role="table"
+                  aria-label="Transacciones recientes"
+                >
+                  <div className="tx-header" role="row">
+                    <span className="tx-header-fech" role="columnheader">Fecha</span>
                     <span className="tx-header-cat" role="columnheader">Categoría</span>
                     <span className="tx-header-val" role="columnheader">Valor</span>
                   </div>
 
-                  {TRANSACCIONES_MOCK.map((item) => {
-                    const nombreCat = item.categoria || item.descripcion || item.nombre || "";
-                    const valorMonto = typeof item.monto !== "undefined" ? item.monto : item.valor;
+                  {dashboardData.transacciones.map((item, index) => (
+                    <div
+                      key={`${item.fecha}-${item.descripcion}-${index}`}
+                      className="transaction-item"
+                      role="row"
+                    >
+                      <span className="tx-date" role="cell">
+                        {formatearFecha(item.fecha)}
+                      </span>
 
-                    return (
-                      <div key={item.id} className="tx-grid transaction-item" role="row">
-                       <span className="tx-date" role="cell">
-                                                 {formatearFecha(item.fecha)}
-                                               </span>
-                        <div className="tx-info" role="cell">
-                          <Icon
-                            icon={obtenerIconoCategoria(nombreCat)}
-                            width="20"
-                            className="tx-icon"
-                            aria-hidden="true"
-                          />
-                          <span>{nombreCat}</span>
+                      <div className="tx-info" role="cell">
+                        <Icon
+                          icon={obtenerIconoCategoria(item.categoria)}
+                          width="20"
+                          height="20"
+                          className="tx-icon"
+                          aria-hidden="true"
+                        />
+
+                        <div className="tx-description">
+                          <span>{item.categoria}</span>
+                          <small>{item.descripcion}</small>
                         </div>
-                        <span className="tx-amount" role="cell">
-                          ${Number(valorMonto || 0).toFixed(2)}
-                        </span>
                       </div>
-                    );
-                  })}
+
+                      <span className="tx-amount" role="cell">
+                        ${Number(item.valor || 0).toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </article>
             </div>
@@ -173,29 +299,38 @@ function Dashboard() {
             {/* COLUMNA 3: Recomendaciones */}
             <article className="card-container recommendations-card">
               <h3>RECOMENDACIONES</h3>
+              {dashboardData.recomendaciones
+                .slice(0, 2)
+                .map((rec, index) => (
 
-              {RECOMENDACIONES_MOCK.slice(0, 2).map((rec) => (
-                <div key={rec.id} className="recommendation-card-item">
-                  <div className="rec-card-top">
-                    <div className="rec-icon-badge">
-                      <Icon
-                        icon={obtenerIconoCategoria(rec.categoria)}
-                        width="24"
-                        height="24"
-                        aria-hidden="true"
-                      />
+                  <div
+                    key={index}
+                    className="recommendation-card-item"
+                  >
+
+                    <div className="rec-card-top">
+
+                      <div className="rec-icon-badge">
+                        <Icon
+                          icon={obtenerIconoCategoria(rec.categoria)}
+                          width="24"
+                        />
+                      </div>
+
+                      <p className="rec-text">
+                        {rec.recomendacion}
+                      </p>
+
                     </div>
-                    <p className="rec-text">{rec.texto}</p>
-                  </div>
+                    <div className="rec-card-bottom">
+                      {/* Añadido el evento onClick llamando a la función de redirección */}
+                      <button type="button" className="btn-green-full" onClick={handleVerDetalle}>
+                        Ver detalles
+                      </button>
+                    </div>
 
-                  <div className="rec-card-bottom">
-                    {/* Añadido el evento onClick llamando a la función de redirección */}
-                    <button type="button" className="btn-green-full" onClick={handleVerDetalle}>
-                      Ver detalles
-                    </button>
                   </div>
-                </div>
-              ))}
+                ))}
             </article>
           </section>
         </div>
