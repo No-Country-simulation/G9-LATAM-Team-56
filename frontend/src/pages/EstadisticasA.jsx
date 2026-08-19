@@ -273,10 +273,18 @@ function EstadisticasA() {
 
               <div className="grafico-chart">
                 <ResponsiveContainer width="100%" height={260}>
-                  <LineChart data={datosGrafico}>
+                  {/* Si no hay datos, enviamos un array con valor 0 para mantener la estructura */}
+                  <LineChart data={datosGrafico.length > 0 ? datosGrafico : [{ name: 'Sin datos', valor: 0 }]}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--neutro-ccc)" />
                     <XAxis dataKey="name" stroke="var(--neutro-666)" fontSize={12} />
-                    <YAxis stroke="var(--neutro-666)" fontSize={12} />
+
+                    {/* Agregamos domain={[0, 'auto']} para que el eje Y siempre sea visible */}
+                    <YAxis
+                      stroke="var(--neutro-666)"
+                      fontSize={12}
+                      domain={[0, 'auto']}
+                    />
+
                     <Tooltip />
                     <Line
                       type="monotone"

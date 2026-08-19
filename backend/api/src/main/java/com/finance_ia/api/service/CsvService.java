@@ -98,7 +98,7 @@ public class CsvService {
             // Filtrar transacciones solo del último mes encontrado
             List<TransaccionRequest> transaccionesUltimoMes = transacciones.stream()
                     .filter(t -> t.getFecha().getMonthValue() == mesObjetivo && t.getFecha().getYear() == anioObjetivo)
-                    .collect(Collectors.toList());
+                    .toList();
 
             // Clasificar las transacciones llamando al servicio financiero
             ClasificacionTransaccionesRequest clasificacionRequest = new ClasificacionTransaccionesRequest();

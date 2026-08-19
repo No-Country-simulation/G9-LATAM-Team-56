@@ -34,7 +34,7 @@ public class EstadisticasService {
                 ));
 
         List<CategoryCardDto> top3 = porCategoria.entrySet().stream()
-                .sorted(Map.Entry.<String, Double>comparingByValue(Comparator.reverseOrder()))
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .limit(3)
                 .map(e -> new CategoryCardDto(e.getKey(), "$" + String.format("%.2f", e.getValue())))
                 .collect(Collectors.toList());
