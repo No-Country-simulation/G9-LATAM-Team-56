@@ -11,7 +11,7 @@ const formatCurrency = (val) => {
 const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
   if (!percent || percent < 0.03) return null;
   const RADIAN = Math.PI / 180;
-  const radius = innerRadius + (outerRadius - innerRadius) * 0.8;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.65;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
@@ -72,7 +72,7 @@ export const GraficoGastos = ({ datos = [], colores = [] }) => {
 
   return (
     <div className="chart-placeholder pie-placeholder">
-      <ResponsiveContainer width="60%" height={200}>
+      <ResponsiveContainer width="65%" height={200}>
         <PieChart>
           <Pie
             data={datosFinales}
@@ -80,11 +80,13 @@ export const GraficoGastos = ({ datos = [], colores = [] }) => {
             nameKey="displayName"
             cx="50%"
             cy="50%"
-            outerRadius={95}
+            outerRadius={84}
             stroke="#ffffff"
             strokeWidth={0.5}
             labelLine={false}
             label={renderCustomizedLabel}
+
+            isAnimationActive={true}
           >
             {datosFinales.map((entry, index) => (
               <Cell

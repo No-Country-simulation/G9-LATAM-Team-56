@@ -1,6 +1,7 @@
 package com.finance_ia.api.service.recommendation;
 
 import com.finance_ia.api.config.RecommendationProperties;
+import com.finance_ia.api.dto.recommendation.RecommendationResult;
 import com.finance_ia.api.model.recommendation.ExpenseCategory;
 import com.finance_ia.api.model.recommendation.RecommendationCandidate;
 import com.finance_ia.api.model.recommendation.RecommendationKey;
@@ -57,18 +58,22 @@ public class RecommendationService {
      * @param request entrada del motor de recomendaciones
      * @return recomendaciones seleccionadas y ordenadas
      */
-    public RecommendationResponse generateRecommendations(RecommendationRequest request) {
+    public RecommendationResponse generateRecommendations(
+        RecommendationRequest request
+    ) {
         if (request == null) {
             throw new IllegalArgumentException(
-                    "La solicitud de recomendaciones es obligatoria"
+                "La solicitud de recomendaciones es obligatoria"
             );
         }
 
-        List<RecommendationCandidate> candidates = createCandidates(request);
+        List<RecommendationCandidate> candidates =
+            createCandidates(request);
 
         sortCandidates(candidates);
 
-        List<String> recommendations = limitAndExtractRecommendations(candidates);
+        List<RecommendationResult> recommendations =
+            limitAndExtractRecommendations(candidates);
 
         return new RecommendationResponse(recommendations);
     }
@@ -133,12 +138,17 @@ public class RecommendationService {
      * Si existen menos candidatos que el máximo configurado,
      * se devuelven todos los candidatos disponibles.
      */
-    private List<String> limitAndExtractRecommendations(
-            List<RecommendationCandidate> candidates
+    private List<RecommendationResult> limitAndExtractRecommendations(
+        List<RecommendationCandidate> candidates
     ) {
         return candidates.stream()
-                .limit(maxRecommendations)
-                .map(RecommendationCandidate::recommendation)
-                .toList();
+            .limit(maxRecommendations)
+            .map(candidate ->
+                new RecommendationResult(
+                    candidate.category(),
+                    candidate.recommendation()
+                )
+            )
+            .toList();
     }
 }

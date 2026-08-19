@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.finance_ia.api.dto.recommendation.RecommendationResult;
 import org.springframework.stereotype.Service;
 
 import com.finance_ia.api.dto.AnalisisFinancieroRequest;
@@ -96,23 +97,10 @@ public class AnalisisFinancieroService {
         PerfilFinancieroResponse perfilResponse
                 = perfilService.predecirPerfil(perfilRequest);
 
-        // 7. Construir TOP de categorías
-        List<TopCategory> topCategories
-                = construirTopCategorias(resumenGastos);
-
-        // 8. Preparar request para el servicio de recomendaciones
-        RecommendationRequest recommendationRequest
-                = new RecommendationRequest(
-                        convertirPerfil(
-                                perfilResponse.getPerfil_financiero()
-                        ),
-                        topCategories
-                );
-
-        // 9. Generar recomendaciones
-        RecommendationResponse recommendationResponse
-                = recommendationService.generateRecommendations(
-                        recommendationRequest
+        RecommendationResponse recommendationResponse =
+                generarRecomendaciones(
+                        perfilResponse.getPerfil_financiero(),
+                        resumenGastos
                 );
 
         // 10. Construir respuesta final
@@ -133,6 +121,9 @@ public class AnalisisFinancieroService {
 
         response.setRecomendaciones(
                 recommendationResponse.recommendations()
+                        .stream()
+                        .map(RecommendationResult::recommendation)
+                        .toList()
         );
 
         return response;
@@ -219,6 +210,25 @@ public class AnalisisFinancieroService {
             ClasificacionTransaccionesRequest request
     ) {
         return transaccionesService.clasificar(request);
+    }
+
+    public RecommendationResponse generarRecomendaciones(
+            String perfilFinanciero,
+            Map<String, Double> resumenGastos
+    ) {
+
+        List<TopCategory> topCategories =
+                construirTopCategorias(resumenGastos);
+
+        RecommendationRequest recommendationRequest =
+                new RecommendationRequest(
+                        convertirPerfil(perfilFinanciero),
+                        topCategories
+                );
+
+        return recommendationService.generateRecommendations(
+                recommendationRequest
+        );
     }
 
 }

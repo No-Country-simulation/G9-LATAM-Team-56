@@ -92,7 +92,7 @@ class RecommendationServiceTest {
 
         assertEquals(
                 "Priorizar la reducción de gastos en restaurantes y limitar el consumo fuera del hogar mientras se estabiliza la situación financiera.",
-                response.recommendations().get(0)
+                response.recommendations().get(0).recommendation()
         );
     }
 
@@ -123,19 +123,19 @@ class RecommendationServiceTest {
                 service.generateRecommendations(request);
 
         assertTrue(
-                response.recommendations().get(0).contains(
+                response.recommendations().get(0).recommendation().contains(
                         "gasto de vivienda"
                 )
         );
 
         assertTrue(
-                response.recommendations().get(1).contains(
+                response.recommendations().get(1).recommendation().contains(
                         "gastos en restaurantes"
                 )
         );
 
         assertTrue(
-                response.recommendations().get(2).contains(
+                response.recommendations().get(2).recommendation().contains(
                         "transporte"
                 )
         );
@@ -245,13 +245,13 @@ class RecommendationServiceTest {
                 service.generateRecommendations(request);
 
         assertTrue(
-                response.recommendations().get(0).contains(
+                response.recommendations().get(0).recommendation().contains(
                         "restaurantes"
                 )
         );
 
         assertTrue(
-                response.recommendations().get(1).contains(
+                response.recommendations().get(1).recommendation().contains(
                         "gastos de salud"
                 )
         );

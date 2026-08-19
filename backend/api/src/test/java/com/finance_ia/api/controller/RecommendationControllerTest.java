@@ -2,6 +2,8 @@ package com.finance_ia.api.controller;
 
 import java.util.List;
 
+import com.finance_ia.api.dto.recommendation.RecommendationResult;
+import com.finance_ia.api.model.recommendation.ExpenseCategory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,8 +39,14 @@ class RecommendationControllerTest {
         RecommendationResponse serviceResponse =
                 new RecommendationResponse(
                         List.of(
-                                "Revisar gastos de restaurante.",
-                                "Optimizar gastos de transporte."
+                                new RecommendationResult(
+                                        ExpenseCategory.RESTAURANT,
+                                        "Revisar gastos de restaurante."
+                                ),
+                                new RecommendationResult(
+                                        ExpenseCategory.TRANSPORTE,
+                                        "Optimizar gastos de transporte."
+                                )
                         )
                 );
 
@@ -217,8 +225,14 @@ class RecommendationControllerTest {
                 .thenReturn(
                         new RecommendationResponse(
                                 List.of(
-                                        "Priorizar la reducción de gastos en restaurantes.",
-                                        "Priorizar alternativas de menor costo en transporte."
+                                        new RecommendationResult(
+                                                ExpenseCategory.RESTAURANT,
+                                                "Revisar gastos de restaurante."
+                                        ),
+                                        new RecommendationResult(
+                                                ExpenseCategory.TRANSPORTE,
+                                                "Optimizar gastos de transporte."
+                                        )
                                 )
                         )
                 );
@@ -242,8 +256,14 @@ class RecommendationControllerTest {
                 .thenReturn(
                         new RecommendationResponse(
                                 List.of(
-                                        "Priorizar la reducción de gastos en restaurantes.",
-                                        "Priorizar alternativas de menor costo en transporte."
+                                        new RecommendationResult(
+                                                ExpenseCategory.RESTAURANT,
+                                                "Priorizar la reducción de gastos en restaurantes."
+                                        ),
+                                        new RecommendationResult(
+                                                ExpenseCategory.TRANSPORTE,
+                                                "Priorizar alternativas de menor costo en transporte."
+                                        )
                                 )
                         )
                 );

@@ -1,6 +1,8 @@
 package com.finance_ia.api.model;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,6 +23,13 @@ public class AnalisisFinancieroEntity {
 
     @OneToMany(mappedBy = "analisisFinanciero", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TransaccionEntity> transacciones;
+
+    @OneToMany(
+            mappedBy = "analisisFinanciero",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<RecomendacionEntity> recomendaciones = new ArrayList<>();
 
     // --- GETTERS Y SETTERS ---
 
@@ -82,4 +91,7 @@ public class AnalisisFinancieroEntity {
 
     public Double getSaldoTotal() { return saldoTotal; }
     public void setSaldoTotal(Double saldoTotal) { this.saldoTotal = saldoTotal; }
+
+    public List<RecomendacionEntity> getRecomendaciones() {return recomendaciones;}
+    public void setRecomendaciones(List<RecomendacionEntity> recomendaciones) {this.recomendaciones = recomendaciones;}
 }

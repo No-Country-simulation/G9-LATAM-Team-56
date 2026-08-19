@@ -1,7 +1,12 @@
 package com.finance_ia.api.dto;
 
-import java.util.List;
+import com.finance_ia.api.dto.recommendation.RecommendationResultDto;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.List;
+@Getter
+@Setter
 public class CsvResponse {
 
     private double ingreso_mensual;
@@ -10,6 +15,7 @@ public class CsvResponse {
     private String perfil_financiero;
     private double probabilidad;
     private List<TransaccionResponse> transacciones;
+    private List<RecommendationResultDto> recomendaciones;
 
     public double getIngreso_mensual() {
         return ingreso_mensual;
