@@ -140,11 +140,11 @@ public class FinancialValidationService {
                 errors
         );
 
-        validarFecha(
+       /* validarFecha(
                 transaccion.getFecha(),
                 fieldPrefix,
                 errors
-        );
+        );*/
     }
 
     private void validarIngresoMensual(
