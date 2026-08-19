@@ -163,11 +163,11 @@ public class FinancialValidationService {
             return;
         }
 
-        if (ingresoMensual < 0) {
+        if (ingresoMensual <= 0) {
 
             errors.add(new ErrorDetail(
                     "ingreso_mensual",
-                    "El ingreso mensual debe ser mayor o igual a 0.",
+                    "El ingreso mensual debe ser mayor a 0.",
                     null
             ));
         }
@@ -381,11 +381,11 @@ public class FinancialValidationService {
                     valor.trim()
             );
 
-            if (ingreso < 0) {
+            if (ingreso <= 0) {
 
                 errors.add(new ErrorDetail(
                         "ingreso_mensual",
-                        "El ingreso mensual debe ser mayor o igual a 0.",
+                        "El ingreso mensual debe ser mayor a 0.",
                         row
                 ));
             }
