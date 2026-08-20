@@ -26,6 +26,7 @@ class AnalisisFinancieroServiceTest {
     private FinancialValidationService validationService;
 
     private AnalisisFinancieroService service;
+    private PerfilFinancieroMapper perfilMapper;
 
     @BeforeEach
     void setUp() {
@@ -36,12 +37,14 @@ class AnalisisFinancieroServiceTest {
         );
         recommendationService = mock(RecommendationService.class);
         validationService = new FinancialValidationService();
+        perfilMapper = new PerfilFinancieroMapper();
 
         service = new AnalisisFinancieroService(
                 perfilService,
                 transaccionesService,
                 recommendationService,
-                validationService
+                validationService,
+                perfilMapper
         );
     }
 

@@ -29,16 +29,20 @@ public class AnalisisFinancieroService {
     private final ClasificadorTransaccionesOnnxService transaccionesService;
     private final RecommendationService recommendationService;
     private final FinancialValidationService validationService;
+    private final PerfilFinancieroMapper perfilMapper;
 
     public AnalisisFinancieroService(
-            PerfilFinancieroOnnxService perfilService,
-            ClasificadorTransaccionesOnnxService transaccionesService,
-            RecommendationService recommendationService, FinancialValidationService validationService) {
+        PerfilFinancieroOnnxService perfilService,
+        ClasificadorTransaccionesOnnxService transaccionesService,
+        RecommendationService recommendationService,
+        FinancialValidationService validationService,
+        PerfilFinancieroMapper perfilMapper) {
 
         this.perfilService = perfilService;
         this.transaccionesService = transaccionesService;
         this.recommendationService = recommendationService;
         this.validationService = validationService;
+        this.perfilMapper = perfilMapper;
     }
 
     public AnalisisFinancieroResponse analizar(
@@ -125,7 +129,7 @@ public class AnalisisFinancieroService {
                 = new AnalisisFinancieroResponse();
 
         response.setPerfil_financiero(
-                perfilResponse.getPerfil_financiero()
+            perfilMapper.toResponse(perfilResponse.getPerfil_financiero())
         );
 
         response.setProbabilidad(
@@ -207,7 +211,7 @@ public class AnalisisFinancieroService {
             case "EN OBSERVACION" ->
                 FinancialProfile.EN_OBSERVACION;
 
-            case "EN RIESGO" ->
+            case "RIESGO" ->
                 FinancialProfile.RIESGO;
 
             default ->
