@@ -43,7 +43,7 @@ class GlobalExceptionHandlerTest {
                         List.of(
                                 new ErrorDetail(
                                         "ingreso_mensual",
-                                        "El ingreso mensual debe ser mayor o igual a 0.",
+                                        "El ingreso mensual debe ser mayor a 0.",
                                         null
                                 ),
                                 new ErrorDetail(
@@ -59,10 +59,15 @@ class GlobalExceptionHandlerTest {
 
         String requestJson = """
                 {
-                    "ingreso_mensual": -100,
-                    "nivel_endeudamiento": 150,
+                    "ingreso_mensual": 5000,
+                    "nivel_endeudamiento": 50,
                     "frecuencia_ahorro": "alta",
-                    "transacciones": []
+                    "transacciones": [
+                        {
+                            "descripcion": "Compra supermercado",
+                            "valor": 100
+                        }
+                    ]
                 }
                 """;
 
@@ -87,7 +92,7 @@ class GlobalExceptionHandlerTest {
                         .value("ingreso_mensual"))
                 .andExpect(jsonPath("$.errors[0].message")
                         .value(
-                                "El ingreso mensual debe ser mayor o igual a 0."
+                                "El ingreso mensual debe ser mayor a 0."
                         ))
                 .andExpect(jsonPath("$.errors[0].row").doesNotExist())
 
@@ -116,7 +121,12 @@ class GlobalExceptionHandlerTest {
                 "ingreso_mensual": 5000,
                 "nivel_endeudamiento": 50,
                 "frecuencia_ahorro": "alta",
-                "transacciones": []
+                "transacciones": [
+                        {
+                            "descripcion": "Compra supermercado",
+                            "valor": 100
+                        }
+                    ]
             }
             """;
 
@@ -199,7 +209,12 @@ class GlobalExceptionHandlerTest {
                 "ingreso_mensual": 5000,
                 "nivel_endeudamiento": 50,
                 "frecuencia_ahorro": "alta",
-                "transacciones": []
+                "transacciones": [
+                        {
+                            "descripcion": "Compra supermercado",
+                            "valor": 100
+                        }
+                    ]
             }
             """;
 
@@ -236,6 +251,7 @@ class GlobalExceptionHandlerTest {
                 .andExpect(jsonPath("$.errors[1].row")
                         .value(7));
     }
+
 
     @TestConfiguration
     static class TestConfig {

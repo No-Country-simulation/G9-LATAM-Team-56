@@ -1,5 +1,6 @@
 package com.finance_ia.api.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,21 +26,21 @@ public class AnalisisFinancieroController {
 
     @PostMapping("/analisis-financiero")
     public AnalisisFinancieroResponse analisis(
-            @RequestBody AnalisisFinancieroRequest request) {
+            @Valid @RequestBody AnalisisFinancieroRequest request) {
 
         return service.analizar(request);
     }
 
     @PostMapping("/perfil-financiero")
     public PerfilFinancieroResponse perfil(
-            @RequestBody PerfilFinancieroRequest request) {
+            @Valid @RequestBody PerfilFinancieroRequest request) {
 
         return service.obtenerPerfil(request);
     }
 
     @PostMapping("/clasificacion-transacciones")
     public ClasificacionTransaccionesResponse clasificarTransacciones(
-            @RequestBody ClasificacionTransaccionesRequest request) {
+            @Valid @RequestBody ClasificacionTransaccionesRequest request) {
 
         return service.clasificarTransacciones(request);
     }

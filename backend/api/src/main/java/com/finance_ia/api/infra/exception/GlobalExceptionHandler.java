@@ -3,6 +3,7 @@ package com.finance_ia.api.infra.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -30,21 +31,51 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
-            IllegalArgumentException exception
+
+    @ExceptionHandler(CsvValidationException.class)
+    public ResponseEntity<ErrorResponse> handleCsvValidationException(
+            CsvValidationException exception
     ) {
 
         ErrorResponse response = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                "BAD_REQUEST",
+                "CSV_VALIDATION_ERROR",
                 exception.getMessage(),
-                List.of()
+                exception.getErrors()
         );
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(response);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex
+    ) {
+
+        List<ErrorDetail> errors =
+                ex.getBindingResult()
+                        .getFieldErrors()
+                        .stream()
+                        .map(error -> new ErrorDetail(
+                                error.getField(),
+                                error.getDefaultMessage(),
+                                null
+                        ))
+                        .toList();
+
+        ErrorResponse response = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "VALIDATION_ERROR",
+                "Los datos enviados no son válidos.",
+                errors
+        );
+
+        return ResponseEntity
+                .badRequest()
                 .body(response);
     }
 
@@ -66,21 +97,24 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
-    @ExceptionHandler(CsvValidationException.class)
-    public ResponseEntity<ErrorResponse> handleCsvValidationException(
-            CsvValidationException exception
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
+            IllegalArgumentException exception
     ) {
 
         ErrorResponse response = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                "CSV_VALIDATION_ERROR",
+                "BAD_REQUEST",
                 exception.getMessage(),
-                exception.getErrors()
+                List.of()
         );
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(response);
     }
+
+
+
 }

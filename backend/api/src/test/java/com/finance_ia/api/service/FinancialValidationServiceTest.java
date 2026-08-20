@@ -37,14 +37,21 @@ class FinancialValidationServiceTest {
     }
 
     @Test
-    void debeAceptarIngresoMensualCero() {
+    void debeRechazarIngresoMensualCero() {
 
-        assertDoesNotThrow(() ->
-                validationService.validarDatosFinancieros(
+        ValidationException exception = assertThrows(
+                ValidationException.class,
+                () -> validationService.validarDatosFinancieros(
                         0.0,
                         50.0,
                         "alta"
                 )
+        );
+
+        assertError(
+                exception,
+                "ingreso_mensual",
+                "El ingreso mensual debe ser mayor a 0."
         );
     }
 
@@ -82,7 +89,7 @@ class FinancialValidationServiceTest {
         assertError(
                 exception,
                 "ingreso_mensual",
-                "El ingreso mensual debe ser mayor o igual a 0."
+                "El ingreso mensual debe ser mayor a 0."
         );
     }
 
@@ -433,7 +440,7 @@ class FinancialValidationServiceTest {
     }
 
     @Test
-    void debeRechazarFechaNull() {
+    void debeAceptarFechaNullEnValidacionManual() {
 
         TransaccionRequest transaccion =
                 crearTransaccion(
@@ -442,15 +449,8 @@ class FinancialValidationServiceTest {
                         null
                 );
 
-        ValidationException exception = assertThrows(
-                ValidationException.class,
-                () -> validationService.validarTransaccion(transaccion)
-        );
-
-        assertError(
-                exception,
-                "fecha",
-                "La fecha de la transacción es obligatoria."
+        assertDoesNotThrow(() ->
+                validationService.validarTransaccion(transaccion)
         );
     }
 
@@ -586,7 +586,7 @@ class FinancialValidationServiceTest {
                 () -> validationService.validarTransaccion(transaccion)
         );
 
-        assertEquals(3, exception.getErrors().size());
+        assertEquals(2, exception.getErrors().size());
 
         assertHasError(
                 exception,
@@ -596,11 +596,6 @@ class FinancialValidationServiceTest {
         assertHasError(
                 exception,
                 "valor"
-        );
-
-        assertHasError(
-                exception,
-                "fecha"
         );
     }
 
@@ -625,7 +620,7 @@ class FinancialValidationServiceTest {
                 () -> validationService.validarTransacciones(transacciones)
         );
 
-        assertEquals(3, exception.getErrors().size());
+        assertEquals(2, exception.getErrors().size());
 
         assertHasError(
                 exception,
@@ -635,11 +630,6 @@ class FinancialValidationServiceTest {
         assertHasError(
                 exception,
                 "transacciones[0].valor"
-        );
-
-        assertHasError(
-                exception,
-                "transacciones[1].fecha"
         );
     }
 
