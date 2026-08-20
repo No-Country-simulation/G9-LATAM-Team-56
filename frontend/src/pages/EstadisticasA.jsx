@@ -110,17 +110,22 @@ function EstadisticasA() {
       let inicio = new Date();
       let fin = new Date(hoy);
 
+      // Definición de rangos de fechas dinámicos para el backend
       if (rangoGrafico === "hoy") {
-        inicio = hoy;
-        fin = hoy;
+        inicio = new Date(hoy);
       } else if (rangoGrafico === "semana") {
-        const diaSemana = hoy.getDay();
-        const diffToMonday = hoy.getDate() - diaSemana + (diaSemana === 0 ? -6 : 1);
-        inicio = new Date(new Date().setDate(diffToMonday));
+        // Últimos 7 días incluyendo hoy
+        inicio = new Date(hoy);
+        inicio.setDate(hoy.getDate() - 6);
       } else if (rangoGrafico === "mes") {
-        inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+        // Ciclo mensual: exactamente un mes atrás hasta hoy
+        inicio = new Date(hoy);
+        inicio.setMonth(hoy.getMonth() - 1);
       } else if (rangoGrafico === "anio") {
-        inicio = new Date(hoy.getFullYear(), 0, 1);
+        // Ciclo anual: 12 meses atrás hasta hoy
+        inicio = new Date(hoy);
+        inicio.setFullYear(hoy.getFullYear() - 1);
+        inicio.setDate(inicio.getDate() + 1);
       }
 
       const fInicio = inicio.toISOString().split("T")[0];
@@ -147,10 +152,12 @@ function EstadisticasA() {
     return new Date(anio, mes - 1, dia);
   };
 
+  // Lógica de procesamiento
   const procesarDatosGrafico = (transacciones, rango, hoy) => {
-    if (!transacciones || transacciones.length === 0) return [];
+    if (!transacciones) transacciones = [];
     const hoyStr = hoy.toISOString().split("T")[0];
 
+    // Directriz HOY: Categorías de transacciones del día actual en Eje X, valor en Eje Y
     if (rango === "hoy") {
       const agrupado = {};
       transacciones.forEach(item => {
@@ -162,44 +169,112 @@ function EstadisticasA() {
       return Object.keys(agrupado).map(cat => ({ name: cat, valor: agrupado[cat] }));
     }
 
+    // Directriz SEMANA: Últimos 7 días terminando en el día actual de la semana
     if (rango === "semana") {
-      const diasOrdenados = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
-      const agrupado = { "Lun": 0, "Mar": 0, "Mié": 0, "Jue": 0, "Vie": 0, "Sáb": 0, "Dom": 0 };
+      const diasSemanaNombres = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+      const resultadoMap = {};
+      const fechasArray = [];
+
+      // Generar los últimos 7 días hacia atrás terminando en hoy
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(hoy);
+        d.setDate(hoy.getDate() - i);
+        const fechaKey = d.toISOString().split("T")[0];
+        const nombreDia = diasSemanaNombres[d.getDay()];
+
+        // Guardamos para mapear, asegurando etiqueta única o formato amigable
+        fechasArray.push({ fechaKey, name: nombreDia });
+        resultadoMap[fechaKey] = 0;
+      }
+
+      // Sumar transacciones por fecha exacta
       transacciones.forEach(item => {
-        const fechaObj = parsearFechaLocal(item.fecha);
-        let jsDay = fechaObj.getDay();
-        const indices = [6, 0, 1, 2, 3, 4, 5];
-        const nombreDia = diasOrdenados[indices[jsDay]];
-        agrupado[nombreDia] += item.valor;
+        if (resultadoMap[item.fecha] !== undefined) {
+          resultadoMap[item.fecha] += item.valor;
+        }
       });
-      return diasOrdenados.map(dia => ({ name: dia, valor: agrupado[dia] }));
+
+      return fechasArray.map(item => ({
+        name: item.name,
+        valor: resultadoMap[item.fechaKey]
+      }));
     }
 
+    // Directriz MES: Ciclo mensual de un mes (ej. 21/07 al 20/08), formato día/mes
     if (rango === "mes") {
-      const agrupado = { "Sem 1": 0, "Sem 2": 0, "Sem 3": 0, "Sem 4": 0 };
+      const resultadoMap = {};
+      const diasArray = [];
+
+      // Calcular desde hace un mes exacto hasta hoy
+      const fechaIterador = new Date(hoy);
+      fechaIterador.setMonth(hoy.getMonth() - 1);
+      // Avanzar un día para iniciar el día siguiente al cierre del ciclo anterior si aplica, o exacto:
+      fechaIterador.setDate(fechaIterador.getDate() + 1);
+
+      while (fechaIterador <= hoy) {
+        const fechaKey = fechaIterador.toISOString().split("T")[0];
+        const diaStr = String(fechaIterador.getDate()).padStart(2, "0");
+        const mesStr = String(fechaIterador.getMonth() + 1).padStart(2, "0");
+        const formatoEtiqueta = `${diaStr}/${mesStr}`;
+
+        diasArray.push({ fechaKey, name: formatoEtiqueta });
+        resultadoMap[fechaKey] = 0;
+
+        fechaIterador.setDate(fechaIterador.getDate() + 1);
+      }
+
       transacciones.forEach(item => {
-        const fechaObj = parsearFechaLocal(item.fecha);
-        const diaMes = fechaObj.getDate();
-        let sem = "Sem 4";
-        if (diaMes <= 7) sem = "Sem 1";
-        else if (diaMes <= 14) sem = "Sem 2";
-        else if (diaMes <= 21) sem = "Sem 3";
-        agrupado[sem] += item.valor;
+        if (resultadoMap[item.fecha] !== undefined) {
+          resultadoMap[item.fecha] += item.valor;
+        }
       });
-      return Object.keys(agrupado).map(sem => ({ name: sem, valor: agrupado[sem] }));
+
+      return diasArray.map(item => ({
+        name: item.name,
+        valor: resultadoMap[item.fechaKey]
+      }));
     }
 
+    // Directriz AÑO: 12 meses, formato MES - AÑO (ej. SEP - 25 a AGO - 26), limitando el mes actual hasta hoy
     if (rango === "anio") {
-      const mesesNombres = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-      const agrupado = {};
-      mesesNombres.forEach(m => agrupado[m] = 0);
+      const mesesNombresCortos = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+      const mesesArray = [];
+
+      // Generar los últimos 12 meses terminando en el mes actual
+      for (let i = 11; i >= 0; i--) {
+        const d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+        const mesIndex = d.getMonth();
+        const anioCorto = String(d.getFullYear()).slice(-2);
+        const nombreMesAnio = `${mesesNombresCortos[mesIndex]} - ${anioCorto}`;
+
+        mesesArray.push({
+          year: d.getFullYear(),
+          month: mesIndex,
+          name: nombreMesAnio,
+          valor: 0
+        });
+      }
+
       transacciones.forEach(item => {
         const fechaObj = parsearFechaLocal(item.fecha);
-        const mesIndex = fechaObj.getMonth();
-        const mesNombre = mesesNombres[mesIndex];
-        if (mesNombre) agrupado[mesNombre] += item.valor;
+        const itemAnio = fechaObj.getFullYear();
+        const itemMes = fechaObj.getMonth();
+
+        // Limitación de mes actual de considerar solo gastos hasta el día actual del mes
+        if (itemAnio === hoy.getFullYear() && itemMes === hoy.getMonth()) {
+          if (fechaObj > hoy) return; // Ignora días futuros dentro del mes actual
+        }
+
+        const encontrado = mesesArray.find(m => m.year === itemAnio && m.month === itemMes);
+        if (encontrado) {
+          encontrado.valor += item.valor;
+        }
       });
-      return mesesNombres.map(mes => ({ name: mes, valor: agrupado[mes] }));
+
+      return mesesArray.map(m => ({
+        name: m.name,
+        valor: m.valor
+      }));
     }
 
     return [];
@@ -313,7 +388,7 @@ function EstadisticasA() {
                   </div>
                 ))
               ) : (
-                <p style={{ color: "#fff", padding: "10px" }}>No hay datos para este período</p>
+                <p style={{ color: "#fff", padding: "10px" }}>Sin Datos registrados para este periodo</p>
               )}
             </div>
           </section>
