@@ -15,6 +15,7 @@ import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class DashboardService {
@@ -39,14 +40,26 @@ public class DashboardService {
             );
         }
 
-        AnalisisFinancieroEntity analisis =
-                analisisRepository.findByUsuarioNombre(usuarioNombre)
-                        .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        "No existe un análisis financiero para el usuario: "
-                                                + usuarioNombre
-                                )
-                        );
+        // Buscamos mediante Optional para manejar el caso de que no exista
+        Optional<AnalisisFinancieroEntity> analisisOpt =
+                analisisRepository.findByUsuarioNombre(usuarioNombre);
+
+        // Si no existe el análisis, devolvemos un DTO con valores por defecto (vacíos/ceros)
+        if (analisisOpt.isEmpty()) {
+            return new DashboardResponse(
+                    "Desconocido", // perfilFinanciero
+                    0.0,              // probabilidad
+                    0.0,              // ingresoMensual
+                    0.0,              // nivelEndeudamiento
+                    "Sin registrar",  // frecuenciaAhorro
+                    0.0,              // saldoTotal
+                    new HashMap<>(),  // resumenGastos vacíos
+                    List.of(),        // transacciones vacías
+                    List.of()         // recomendaciones vacías
+            );
+        }
+
+        AnalisisFinancieroEntity analisis = analisisOpt.get();
 
         Map<String, Double> resumenGastos =
                 construirResumenGastos(

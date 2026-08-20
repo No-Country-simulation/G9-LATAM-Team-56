@@ -93,6 +93,7 @@ function Perfil() {
       const responseMessage = await uploadCsvFile(file, nombreUsuario);
 
       setMessage('¡CSV importado con éxito!');
+      localStorage.setItem("csvCargado", "true");
       setIsError(false);
 
       // Recargar los datos del perfil automáticamente tras subir el CSV
