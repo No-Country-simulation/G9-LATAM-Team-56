@@ -97,7 +97,7 @@ public class CsvService {
 
             // Definir el rango del mes actual (desde el día 1 hasta el día actual de ese mes)
             // Si el mes objetivo coincide con el mes actual del sistema, limitamos hasta LocalDate.now()
-            // De lo contrario, si es un mes histórico cerrado, toma todo el mes.
+            // De lo contrario, si es un mes histórico cerrado, toma el mes completo.
             LocalDate inicioMes = LocalDate.of(anioObjetivo, mesObjetivo, 1);
             LocalDate finMes;
 
