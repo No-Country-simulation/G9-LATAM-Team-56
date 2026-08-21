@@ -6,13 +6,14 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.finance_ia.api.dto.recommendation.RecommendationResult;
-import com.finance_ia.api.dto.recommendation.RecommendationResultDto;
-import com.finance_ia.api.model.RecomendacionEntity;
-import com.finance_ia.api.model.recommendation.RecommendationResponse;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -26,8 +27,12 @@ import com.finance_ia.api.dto.PerfilFinancieroRequest;
 import com.finance_ia.api.dto.PerfilFinancieroResponse;
 import com.finance_ia.api.dto.TransaccionRequest;
 import com.finance_ia.api.dto.TransaccionResponse;
+import com.finance_ia.api.dto.recommendation.RecommendationResult;
+import com.finance_ia.api.dto.recommendation.RecommendationResultDto;
 import com.finance_ia.api.model.AnalisisFinancieroEntity;
+import com.finance_ia.api.model.RecomendacionEntity;
 import com.finance_ia.api.model.TransaccionEntity;
+import com.finance_ia.api.model.recommendation.RecommendationResponse;
 import com.finance_ia.api.repository.AnalisisFinancieroRepository;
 
 @Service
@@ -66,6 +71,7 @@ public class CsvService {
             double ingresoMensual = 0;
             double nivelEndeudamiento = 0;
             String frecuenciaAhorro = null;
+            String divisa = null;
             boolean primeraFila = true;
 
             // Recorremos cada línea del archivo CSV
@@ -74,6 +80,7 @@ public class CsvService {
                     ingresoMensual = Double.parseDouble(record.get("ingreso_mensual"));
                     nivelEndeudamiento = Double.parseDouble(record.get("nivel_endeudamiento"));
                     frecuenciaAhorro = record.get("frecuencia_ahorro");
+                    divisa = record.get("divisa");
                     primeraFila = false;
                 }
 
@@ -172,6 +179,7 @@ public class CsvService {
                 entidadAnalisis.setIngresoMensual(ingresoMensual);
                 entidadAnalisis.setNivelEndeudamiento(nivelEndeudamiento);
                 entidadAnalisis.setFrecuenciaAhorro(frecuenciaAhorro);
+                entidadAnalisis.setDivisa(divisa);
                 entidadAnalisis.setPerfilFinanciero(perfilResponse.getPerfil_financiero());
                 entidadAnalisis.setProbabilidad(perfilResponse.getProbabilidad());
                 entidadAnalisis.setSaldoTotal(saldoTotalUltimoMes);
@@ -211,6 +219,7 @@ public class CsvService {
                 entidadAnalisis.setIngresoMensual(ingresoMensual);
                 entidadAnalisis.setNivelEndeudamiento(nivelEndeudamiento);
                 entidadAnalisis.setFrecuenciaAhorro(frecuenciaAhorro);
+                entidadAnalisis.setDivisa(divisa);
                 entidadAnalisis.setPerfilFinanciero(perfilResponse.getPerfil_financiero());
                 entidadAnalisis.setProbabilidad(perfilResponse.getProbabilidad());
                 entidadAnalisis.setSaldoTotal(saldoTotalUltimoMes);
@@ -242,6 +251,7 @@ public class CsvService {
             response.setIngreso_mensual(ingresoMensual);
             response.setNivel_endeudamiento(nivelEndeudamiento);
             response.setFrecuencia_ahorro(frecuenciaAhorro);
+            response.setDivisa(divisa);
             response.setPerfil_financiero(perfilResponse.getPerfil_financiero());
             response.setProbabilidad(perfilResponse.getProbabilidad());
             response.setTransacciones(transaccionesCategorizadas);
