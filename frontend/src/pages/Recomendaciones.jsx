@@ -1,62 +1,92 @@
-import React from "react";
-import { useNavigate } from "react-router-dom"; // Importar el hook de navegación
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import Sidebar from "../components/Sidebar";
 import UserBadge from "../components/UserBadge";
+import { obtenerDashboard } from "/services/api";
 import "./Recomendaciones.css";
 
-// 1. Datos de prueba preparados con "prioridad"
-const recomendacionesData = [
-  {
-    id: 1,
-    title: "Aumenta tu ahorro mensual",
-    description: "Intenta ahorrar al menos el 20% de tus ingresos",
-    prioridad: "BAJA", // Verde (Saludable)
-  },
-  {
-    id: 2,
-    title: "Evolución del gasto",
-    description: "Tu nivel de endeudamiento subió 5% este mes",
-    prioridad: "MEDIA", // Naranja (Advertencia)
-  },
-  {
-    id: 3,
-    title: "Reduce tus gastos",
-    description: "Tu gasto en restaurante representa el 20% de tus gastos totales",
-    prioridad: "ALTA", // Rojo (Riesgo)
-  },
-];
+// Normaliza texto para comparar sin depender de mayúsculas/tildes exactas
+const normalizar = (texto) =>
+  (texto || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 
-// 2. Función helper para convertir prioridad en clase CSS e icono de la izquierda
-const getStatusConfig = (prioridad) => {
-  switch (prioridad) {
-    case "ALTA":
-      return {
-        bgClass: "status-bad-bg",
-        iconLeft: "mdi:emoticon-dead",
-      };
-    case "MEDIA":
-      return {
-        bgClass: "status-warning-bg",
-        iconLeft: "ph:warning-fill",
-      };
-    case "BAJA":
+// Determina el estilo (color + ícono) según el perfil financiero del usuario
+const getStatusConfig = (perfilFinanciero) => {
+  const perfil = normalizar(perfilFinanciero);
+
+  switch (perfil) {
+    case "riesgo":
+      return { bgClass: "status-bad-bg", iconLeft: "mdi:emoticon-dead" };
+    case "en observacion":
+      return { bgClass: "status-warning-bg", iconLeft: "ph:warning-fill" };
+    case "saludable":
+      return { bgClass: "status-good-bg", iconLeft: "solar:shield-check-bold" };
     default:
-      return {
-        bgClass: "status-good-bg",
-        iconLeft: "solar:shield-check-bold",
-      };
+      console.warn(`Perfil financiero no reconocido: "${perfilFinanciero}"`);
+      return { bgClass: "status-good-bg", iconLeft: "solar:shield-check-bold" };
   }
 };
 
-//------------------------------------------------------------------------------------------------------------------
-export default function Recomendaciones() {
-  const navigate = useNavigate(); // Inicializar la función de navegación
+// Determina el ícono según la categoría de la recomendación
+const getCategoriaIcon = (categoria) => {
+  const cat = normalizar(categoria);
 
-  // Función que maneja el evento al hacer clic en el botón
+  const iconos = {
+    transporte: "mdi:car",
+    electronicos: "mdi:laptop",
+    alimentacion: "mdi:food",
+    vivienda: "mdi:home",
+    servicios: "mdi:flash",
+    restaurante: "mdi:silverware-fork-knife",
+    entretenimiento: "mdi:movie-open",
+    vestuario: "mdi:tshirt-crew",
+    salud: "mdi:medical-bag",
+    educacion: "mdi:school",
+    credito: "mdi:cash",
+  };
+
+  return iconos[cat] || "mdi:lightbulb-outline"; // ícono por defecto si no coincide
+};
+
+export default function Recomendaciones() {
+  const navigate = useNavigate();
+
+  const [recomendaciones, setRecomendaciones] = useState([]);
+  const [perfilFinanciero, setPerfilFinanciero] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const nombreUsuario = localStorage.getItem("usuarioNombre");
+
+    if (!nombreUsuario) {
+      setError("No se encontró el usuario. Inicia sesión de nuevo.");
+      setLoading(false);
+      return;
+    }
+
+    obtenerDashboard(nombreUsuario)
+      .then((data) => {
+        setPerfilFinanciero(data.perfil_financiero);
+        setRecomendaciones(data.recomendaciones || []);
+      })
+      .catch((err) => {
+        console.error("No se pudieron cargar las recomendaciones:", err);
+        setError(
+          "No se pudieron cargar las recomendaciones. Importa un CSV desde tu Perfil si aún no lo has hecho.",
+        );
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
   const handleVerDetalle = () => {
-      navigate("/estadisticas");
-    };
+    navigate("/estadisticas");
+  };
+
+  const { bgClass, iconLeft } = getStatusConfig(perfilFinanciero);
 
   return (
     <div className="recomendaciones-layout">
@@ -64,7 +94,6 @@ export default function Recomendaciones() {
 
       <div className="recomendaciones-main">
         <div className="recomendaciones-dark-bg">
-          {/* TOPBAR */}
           <header className="recomendaciones-topbar">
             <div className="search-box">
               <input type="text" placeholder="¿qué deseas buscar?" />
@@ -74,43 +103,64 @@ export default function Recomendaciones() {
             <UserBadge />
           </header>
 
-          {/* HERO */}
           <section className="recomendaciones-hero">
             <h1>Recomendaciones</h1>
             <h2>Sugerencias para mejorar tu salud financiera</h2>
           </section>
 
-          {/* GRID */}
           <section className="recomendaciones-content">
-            <div className="recomendaciones-grid">
-              {recomendacionesData.slice(0, 3).map((item) => {
-                const { bgClass, iconLeft } = getStatusConfig(item.prioridad);
+            {loading && (
+              <p className="rec-status-msg">Cargando recomendaciones...</p>
+            )}
 
-                return (
-                  <div key={item.id} className="rec-full-card">
-                    {/* SECCIÓN IZQUIERDA */}
+            {!loading && error && (
+              <p className="rec-status-msg rec-error">{error}</p>
+            )}
+
+            {!loading && !error && recomendaciones.length === 0 && (
+              <p className="rec-status-msg">
+                Aún no tienes recomendaciones. Importa un CSV desde tu Perfil.
+              </p>
+            )}
+
+            {!loading && !error && recomendaciones.length > 0 && (
+              <div className="recomendaciones-grid">
+                {recomendaciones.slice(0, 3).map((item, index) => (
+                  <div
+                    key={`${item.categoria}-${index}`}
+                    className="rec-full-card"
+                  >
                     <div className={`rec-card-left ${bgClass}`}>
                       <div className="rec-hero-icon-badge">
-                        <Icon icon={iconLeft} width="28" />
+                        <Icon
+                          icon={getCategoriaIcon(item.categoria)}
+                          width="28"
+                        />
                       </div>
                       <div className="rec-text-info">
-                        <h3>{item.title}</h3>
-                        <p>{item.description}</p>
+                        <h3>{item.categoria}</h3>
+                        <p>{item.recomendacion}</p>
                       </div>
                     </div>
 
-                    {/* SECCIÓN DERECHA */}
                     <div className="rec-card-right">
-                      <Icon icon="flat-color-icons:combo-chart" width="44" className="rec-action-icon" />
-                      {/* Añadido el evento onClick llamando a la función de redirección */}
-                      <button type="button" className="btn-blue-action" onClick={handleVerDetalle}>
+                      <Icon
+                        icon="flat-color-icons:combo-chart"
+                        width="44"
+                        className="rec-action-icon"
+                      />
+                      <button
+                        type="button"
+                        className="btn-blue-action"
+                        onClick={handleVerDetalle}
+                      >
                         Ver detalle
                       </button>
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
           </section>
         </div>
       </div>
