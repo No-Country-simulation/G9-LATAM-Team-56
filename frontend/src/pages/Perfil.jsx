@@ -20,7 +20,8 @@ function Perfil() {
   const [cuentaInfo, setCuentaInfo] = useState([
       { label: "Moneda", value: "Cargando...", icon: "mdi:currency-usd" },
       { label: "Ingreso Mensual", value: "Cargando...", icon: "mdi:cash" },
-      { label: "Saldo Total", value: "Cargando...", icon: "mdi:wallet-outline" },
+      { label: "Gastos Total del Mes", value: "Cargando...", icon: "mdi:wallet-outline" },
+      { label: "Saldo del Mes [Ahorro]", value: "Cargando...", icon: "mdi:piggy-bank-outline" },
       { label: "Nivel de Endeudamiento", value: "Cargando...", icon: "mdi:percent-outline" },
   ]);
 
@@ -43,7 +44,8 @@ function Perfil() {
              setCuentaInfo([
                  { label: "Moneda", value: data.moneda, icon: "mdi:currency-usd" },
                  { label: "Ingreso Mensual", value: data.ingresoMensual, icon: "mdi:cash" },
-                 { label: "Saldo Total", value: data.saldoTotal, icon: "mdi:wallet-outline" },
+                 { label: "Gastos Total del Mes", value: data.gastoTotal, icon: "mdi:wallet-outline" },
+                 { label: "Saldo del Mes [Ahorro]", value: data.saldoTotal, icon: "mdi:piggy-bank-outline" },
                  { label: "Nivel de Endeudamiento", value: data.nivelEndeudamiento, icon: "mdi:percent-outline" },
              ]);
          })
@@ -53,7 +55,8 @@ function Perfil() {
              setCuentaInfo([
                  { label: "Moneda", value: "USD Dólar", icon: "mdi:currency-usd" },
                  { label: "Ingreso Mensual", value: "$0.0", icon: "mdi:cash" },
-                 { label: "Saldo Total", value: "$0.00", icon: "mdi:wallet-outline" },
+                 { label: "Gastos Total del Mes", value: "$0.0", icon: "mdi:wallet-outline" },
+                 { label: "Saldo del Mes [Ahorro]", value: "$0.00", icon: "mdi:piggy-bank-outline" },
                  { label: "Nivel de Endeudamiento", value: "0%", icon: "mdi:percent-outline" },
              ]);
          });
@@ -90,6 +93,7 @@ function Perfil() {
       const responseMessage = await uploadCsvFile(file, nombreUsuario);
 
       setMessage('¡CSV importado con éxito!');
+      localStorage.setItem("csvCargado", "true");
       setIsError(false);
 
       // Recargar los datos del perfil automáticamente tras subir el CSV
@@ -97,7 +101,8 @@ function Perfil() {
       setCuentaInfo([
           { label: "Moneda", value: datosNuevos.moneda, icon: "mdi:currency-usd" },
           { label: "Ingreso Mensual", value: datosNuevos.ingresoMensual, icon: "mdi:cash" },
-          { label: "Saldo Total", value: datosNuevos.saldoTotal, icon: "mdi:wallet-outline" },
+          { label: "Gastos Total del Mes", value: datosNuevos.gastoTotal, icon: "mdi:wallet-outline" },
+          { label: "Saldo del Mes [Ahorro]", value: datosNuevos.saldoTotal, icon: "mdi:piggy-bank-outline" },
           { label: "Nivel de Endeudamiento", value: datosNuevos.nivelEndeudamiento, icon: "mdi:percent-outline" },
       ]);
 
@@ -141,13 +146,13 @@ function Perfil() {
                   <Icon icon="mdi:account-circle" width="48" />
                 </div>
                 <div>
-                  {/* 👈 Mostramos dinámicamente el nombre y correo obtenidos del login */}
+                  {/* Mostramos dinámicamente el nombre y correo obtenidos del login */}
                   <p className="user-name">{nombreUsuario}</p>
                   <p className="user-email">{correoUsuario}</p>
                 </div>
               </div>
               <div className="perfil-card-right">
-                <button className="btn-primary">Editar Perfil</button>
+                   {/*<button className="btn-primary">Editar Perfil</button>*/}
               </div>
             </div>
 

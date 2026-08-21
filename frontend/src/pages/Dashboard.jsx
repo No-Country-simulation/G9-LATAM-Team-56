@@ -9,19 +9,11 @@ import { GraficoGastos } from "../components/GraficoGastos";
 import {
   COLORS_GASTOS,
   obtenerIconoCategoria,
-  obtenerEstadoSalud,
   obtenerGaugeData
 } from "./dashboardData.mock";
 
 import { useEffect, useState } from "react";
 import { obtenerDashboard } from "../../services/api";
-
-// Datos de prueba (sustituir por llamados Axios/Fetch a la API de Spring Boot)
-import {
-  GAUGE_MOCK
-} from "./dashboardData.mock";
-
-
 
 // Helper para dar formato a la fecha
 const formatearFecha = (fechaStr) => {
@@ -63,7 +55,15 @@ function Dashboard() {
       } catch (err) {
         console.error("Error al cargar dashboard:", err);
         if (isMounted) {
-          setError(err.message);
+          // En caso de error de red, cargamos un objeto seguro por defecto
+          setDashboardData({
+            perfil_financiero: "Sin determinar",
+            probabilidad: 0,
+            nivel_endeudamiento: 0,
+            resumen_gastos: {},
+            transacciones: [],
+            recomendaciones: [],
+          });
         }
       } finally {
         if (isMounted) {
@@ -79,19 +79,6 @@ function Dashboard() {
       isMounted = false;
     };
   }, []);
-
-  if (loading) {
-    return <div>Cargando dashboard...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  if (!dashboardData) {
-    return <div>No hay datos disponibles.</div>;
-  }
-  console.log("DATOS DEL DASHBOARD:", dashboardData);
 
   const obtenerEstadoSalud = (perfil = "") => {
     const perfilLimpio = perfil.trim().toLowerCase();
@@ -124,37 +111,88 @@ function Dashboard() {
     }
 
     return {
-      texto: "Sin determinar",
+      texto: "Desconocido",
       claseCss: ""
     };
   };
 
-  const estadoSalud = obtenerEstadoSalud(
-    dashboardData.perfil_financiero
-  );
-
-  const gaugeData = obtenerGaugeData(
-    dashboardData.perfil_financiero
-  );
+  // Uso seguro de datos con operador opcional (?.)
+  const estadoSalud = obtenerEstadoSalud(dashboardData?.perfil_financiero);
+  const gaugeData = obtenerGaugeData(dashboardData?.perfil_financiero);
 
   const handleVerDetalle = () => {
     navigate("/recomendaciones");
   };
 
-  const gastosGrafico =
-    Object.entries(
-      dashboardData.resumen_gastos
-    ).map(([categoria, monto]) => ({
-      categoria,
-      monto
-    }));
+  const gastosGrafico = dashboardData?.resumen_gastos
+    ? Object.entries(dashboardData.resumen_gastos).map(([categoria, monto]) => ({
+        categoria,
+        monto
+      }))
+    : [];
 
-
+  // Flag para saber si el perfil no está determinado y ocultar la aguja del gráfico
+  const esSinDeterminar = !dashboardData?.perfil_financiero || dashboardData.perfil_financiero === "Desconocido" || dashboardData.probabilidad === 0;
 
   return (
-    <div className="dashboard-layout">
-      <Sidebar />
+    <div className="dashboard-layout" style={{ position: "relative" }}>
 
+      {/* Pop-up persistente de bloqueo si no hay perfil y ya terminó de cargar */}
+      {!loading && esSinDeterminar && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          backgroundColor: "rgba(0, 0, 0, 0.75)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 9999,
+          backdropFilter: "blur(4px)"
+        }}>
+          <div style={{
+            backgroundColor: "#1e293b",
+            padding: "30px",
+            borderRadius: "12px",
+            maxWidth: "450px",
+            width: "90%",
+            textAlign: "center",
+            boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+            border: "1px solid #334155",
+            fontFamily: "inherit",
+            color: "#f8fafc"
+          }}>
+            <Icon icon="mdi:alert-circle-outline" width="48" style={{ color: "#f59e0b", marginBottom: "15px" }} />
+            <h3 style={{ fontSize: "1.25rem", marginBottom: "10px", fontWeight: "bold" }}>Perfil Financiero No Detectado</h3>
+            <p style={{ color: "#94a3b8", fontSize: "0.95rem", lineHeight: "1.5", marginBottom: "25px" }}>
+              Dado que no existen registros actuales de su perfil financiero, es necesario configurar su cuenta para continuar utilizando la plataforma.
+            </p>
+            <button
+              onClick={() => navigate("/perfil")}
+              style={{
+                backgroundColor: "#2563eb",
+                color: "#ffffff",
+                border: "none",
+                padding: "10px 20px",
+                borderRadius: "6px",
+                fontSize: "0.95rem",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "background-color 0.2s",
+                width: "100%"
+              }}
+              onMouseOver={(e) => e.target.style.backgroundColor = "#1d4ed8"}
+              onMouseOut={(e) => e.target.style.backgroundColor = "#2563eb"}
+            >
+              Ir a la ventana Perfil
+            </button>
+          </div>
+        </div>
+      )}
+
+      <Sidebar />
       <main className="dashboard-main">
         <div className="dashboard-dark-bg">
           <header className="dashboard-topbar">
@@ -174,165 +212,221 @@ function Dashboard() {
             <h2>Tu Resumen Financiero</h2>
           </section>
 
-          <section className="dashboard-grid">
-            {/* COLUMNA 1: Perfil Financiero */}
-            <article className="card-container profile-card">
-              <div className="profile-top-section">
-                <header className="card-header-plain">
-                  <h3>PERFIL FINANCIERO</h3>
-                </header>
-
-                <PieChartWithNeedle
-                  scoreValue={dashboardData.probabilidad * 100}
-                  gaugeData={gaugeData}
-                />
-              </div>
-
-              <div className="profile-bottom-section">
-                <div className="score-section">
-                  <h3>SALUD FINANCIERA</h3>
-
-                  <p>
-                    <span className={estadoSalud.claseCss}>
-                      {estadoSalud.texto}
-                    </span>
-                  </p>
-                </div>
-
-                <div className="kpi-buttons-grid">
-                  <div className="kpi-blue-button">
-                    <div className="kpi-icon-badge">
-                      <Icon icon="mdi:account-reactivate" width="24" aria-hidden="true" />
-                    </div>
-                    <span>Perfil</span>
-                    <strong>
-                      {dashboardData.perfil_financiero}
-                    </strong>
-                  </div>
-
-                  <div className="kpi-blue-button">
-                    <div className="kpi-icon-badge">
-                      <Icon icon="ph:chart-pie-fill" width="24" aria-hidden="true" />
-                    </div>
-                    <span>Probabilidad</span>
-                    <strong>
-                      {(dashboardData.probabilidad * 100).toFixed(1)}%
-                    </strong>
-                  </div>
-
-                  <div className="kpi-blue-button">
-                    <div className="kpi-icon-badge">
-                      <Icon icon="mdi:sack-percent" width="22" aria-hidden="true" />
-                    </div>
-                    <span>Endeudamiento</span>
-                    <strong>
-                      {dashboardData.nivel_endeudamiento}%
-                    </strong>
-                  </div>
-                </div>
-              </div>
-            </article>
-
-            {/* COLUMNA 2: Resumen de Gastos y Transacciones */}
-            <div className="dashboard-center-column">
-              <article className="card-container">
-                <header className="card-header-light">
-                  <h3>RESUMEN DE GASTOS</h3>
-                </header>
-
-                <GraficoGastos
-                  datos={gastosGrafico}
-                  colores={COLORS_GASTOS}
-                />
-              </article>
-
-              <article className="card-container">
-                <header className="card-header-light">
-                  <h3>TRANSACCIONES RECIENTES</h3>
-                </header>
-
-                <div
-                  className="transactions-list"
-                  role="table"
-                  aria-label="Transacciones recientes"
-                >
-                  <div className="tx-header" role="row">
-                    <span className="tx-header-fech" role="columnheader">Fecha</span>
-                    <span className="tx-header-cat" role="columnheader">Categoría</span>
-                    <span className="tx-header-val" role="columnheader">Valor</span>
-                  </div>
-
-                  {dashboardData.transacciones.map((item, index) => (
-                    <div
-                      key={`${item.fecha}-${item.descripcion}-${index}`}
-                      className="transaction-item"
-                      role="row"
-                    >
-                      <span className="tx-date" role="cell">
-                        {formatearFecha(item.fecha)}
-                      </span>
-
-                      <div className="tx-info" role="cell">
-                        <Icon
-                          icon={obtenerIconoCategoria(item.categoria)}
-                          width="20"
-                          height="20"
-                          className="tx-icon"
-                          aria-hidden="true"
-                        />
-
-                        <div className="tx-description">
-                          <span>{item.categoria}</span>
-                          <small>{item.descripcion}</small>
-                        </div>
-                      </div>
-
-                      <span className="tx-amount" role="cell">
-                        ${Number(item.valor || 0).toFixed(2)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </article>
+          {/* Si está cargando, mostramos un contenedor de carga estilizado dentro del mismo layout sin romper el DOM */}
+          {loading ? (
+            <div style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "400px",
+              color: "#94a3b8",
+              fontSize: "1.1rem"
+            }}>
+              Cargando información del dashboard...
             </div>
+          ) : (
+            <section className="dashboard-grid">
+              {/* COLUMNA 1: Perfil Financiero */}
+              <article className="card-container profile-card">
+                <div className="profile-top-section">
+                  <header className="card-header-plain">
+                    <h3>PERFIL FINANCIERO</h3>
+                  </header>
 
-            {/* COLUMNA 3: Recomendaciones */}
-            <article className="card-container recommendations-card">
-              <h3>RECOMENDACIONES</h3>
-              {dashboardData.recomendaciones
-                .slice(0, 2)
-                .map((rec, index) => (
+                  <PieChartWithNeedle
+                    scoreValue={esSinDeterminar ? null : dashboardData.probabilidad * 100}
+                    gaugeData={gaugeData}
+                  />
+                </div>
+
+                <div className="profile-bottom-section">
+                  <div className="score-section">
+                    <h3>SALUD FINANCIERA</h3>
+
+                    <p>
+                      <span className={estadoSalud.claseCss} style={esSinDeterminar ? { color: "#9ca3af" } : {}}>
+                        {estadoSalud.texto}
+                      </span>
+                    </p>
+                  </div>
+
+                  <div className="kpi-buttons-grid">
+                    <div className="kpi-blue-button">
+                      <div className="kpi-icon-badge">
+                        <Icon icon="mdi:account-reactivate" width="24" aria-hidden="true" />
+                      </div>
+                      <span>Perfil</span>
+                      <strong>
+                        {dashboardData.perfil_financiero}
+                      </strong>
+                    </div>
+
+                    <div className="kpi-blue-button">
+                      <div className="kpi-icon-badge">
+                        <Icon icon="ph:chart-pie-fill" width="24" aria-hidden="true" />
+                      </div>
+                      <span>Probabilidad</span>
+                      <strong>
+                        {(dashboardData.probabilidad * 100).toFixed(1)}%
+                      </strong>
+                    </div>
+
+                    <div className="kpi-blue-button">
+                      <div className="kpi-icon-badge">
+                        <Icon icon="mdi:sack-percent" width="22" aria-hidden="true" />
+                      </div>
+                      <span>Endeudamiento</span>
+                      <strong>
+                        {dashboardData.nivel_endeudamiento}%
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              {/* COLUMNA 2: Resumen de Gastos y Transacciones */}
+              <div className="dashboard-center-column">
+                <article className="card-container">
+                  <header className="card-header-light">
+                    <h3>RESUMEN DE GASTOS</h3>
+                  </header>
+                  {gastosGrafico.length === 0 ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: "120px",
+                        color: "#9ca3af",
+                        textAlign: "center"
+                      }}
+                    >
+                      Sin Datos registrados para este periodo
+                    </div>
+                  ) : (
+                    <GraficoGastos
+                      datos={gastosGrafico}
+                      colores={COLORS_GASTOS}
+                    />
+                  )}
+                </article>
+
+                <article className="card-container">
+                  <header className="card-header-light">
+                    <h3>TRANSACCIONES RECIENTES</h3>
+                  </header>
 
                   <div
-                    key={index}
-                    className="recommendation-card-item"
+                    className="transactions-list"
+                    role="table"
+                    aria-label="Transacciones recientes"
                   >
+                    <div className="tx-header" role="row">
+                      <span className="tx-header-fech" role="columnheader">Fecha</span>
+                      <span className="tx-header-cat" role="columnheader">Categoría</span>
+                      <span className="tx-header-val" role="columnheader">Valor</span>
+                    </div>
 
-                    <div className="rec-card-top">
-
-                      <div className="rec-icon-badge">
-                        <Icon
-                          icon={obtenerIconoCategoria(rec.categoria)}
-                          width="24"
-                        />
+                    {(dashboardData?.transacciones || []).length === 0 ? (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          height: "120px",
+                          color: "#9ca3af",
+                          textAlign: "center"
+                        }}
+                      >
+                        Sin Datos registrados para este periodo.
                       </div>
+                    ) : (
+                      (dashboardData?.transacciones || []).map((item, index) => (
+                        <div
+                          key={`${item.fecha}-${item.descripcion}-${index}`}
+                          className="transaction-item"
+                          role="row"
+                      >
+                        <span className="tx-date" role="cell">
+                          {formatearFecha(item.fecha)}
+                        </span>
 
-                      <p className="rec-text">
-                        {rec.recomendacion}
-                      </p>
+                        <div className="tx-info" role="cell">
+                          <Icon
+                            icon={obtenerIconoCategoria(item.categoria)}
+                            width="20"
+                            height="20"
+                            className="tx-icon"
+                            aria-hidden="true"
+                          />
 
-                    </div>
-                    <div className="rec-card-bottom">
-                      {/* Añadido el evento onClick llamando a la función de redirección */}
-                      <button type="button" className="btn-green-full" onClick={handleVerDetalle}>
-                        Ver detalles
-                      </button>
-                    </div>
+                          <div className="tx-description">
+                            <span>{item.categoria}</span>
+                            <small>{item.descripcion}</small>
+                          </div>
+                        </div>
 
+                        <span className="tx-amount" role="cell">
+                          ${Number(item.valor || 0).toFixed(2)}
+                        </span>
+                      </div>
+                      ))
+                    )}
                   </div>
-                ))}
-            </article>
-          </section>
+                </article>
+              </div>
+
+              {/* COLUMNA 3: Recomendaciones */}
+              <article className="card-container recommendations-card">
+                <h3>RECOMENDACIONES</h3>
+                {(dashboardData?.recomendaciones || []).length === 0 ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "150px",
+                      color: "#9ca3af",
+                      textAlign: "center"
+                    }}
+                  >
+                    Sin Datos registrados para este periodo.
+                  </div>
+                ) : (
+                  (dashboardData?.recomendaciones || [])
+                    .slice(0, 2)
+                    .map((rec, index) => (
+
+                      <div
+                        key={index}
+                        className="recommendation-card-item"
+                      >
+
+                        <div className="rec-card-top">
+
+                          <div className="rec-icon-badge">
+                            <Icon
+                              icon={obtenerIconoCategoria(rec.categoria)}
+                              width="24"
+                            />
+                          </div>
+
+                          <p className="rec-text">
+                            {rec.recomendacion}
+                          </p>
+
+                        </div>
+                        <div className="rec-card-bottom">
+                          <button type="button" className="btn-green-full" onClick={handleVerDetalle}>
+                            Ver detalles
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                )}
+              </article>
+            </section>
+          )}
         </div>
       </main>
     </div>
