@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { obtenerEstadisticas } from "/services/api";
 import axios from "axios";
 import { Icon } from "@iconify/react";
 import {
@@ -88,10 +89,12 @@ function EstadisticasA() {
 
     const cargarTarjetas = async () => {
       try {
-        const res = await axios.get(`http://localhost:8080/api/estadisticas`, {
-          params: { usuario: usuarioActual, inicio: fechaInicioFiltro, fin: fechaFinFiltro }
+        const data = await obtenerEstadisticas({
+            usuario: usuarioActual,
+            inicio: fechaInicioFiltro,
+            fin: fechaFinFiltro
         });
-        setTopCategorias(res.data.top3 || []);
+        setTopCategorias(data.top3 || []);
       } catch (error) {
         console.error("Error al cargar tarjetas:", error);
       }
@@ -132,11 +135,13 @@ function EstadisticasA() {
       const fFin = fin.toISOString().split("T")[0];
 
       try {
-        const res = await axios.get(`http://localhost:8080/api/estadisticas`, {
-          params: { usuario: usuarioActual, inicio: fInicio, fin: fFin }
+        const data = await obtenerEstadisticas({
+            usuario: usuarioActual,
+            inicio: fInicio,
+            fin: fFin
         });
 
-        const transacciones = res.data.transaccionesDetalladas || [];
+        const transacciones = data.transaccionesDetalladas || [];
         const datosProcesados = procesarDatosGrafico(transacciones, rangoGrafico, hoy);
         setDatosGrafico(datosProcesados);
       } catch (error) {
