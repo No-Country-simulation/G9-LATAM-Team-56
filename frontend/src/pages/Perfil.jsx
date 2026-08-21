@@ -48,6 +48,10 @@ function Perfil() {
                  { label: "Saldo del Mes [Ahorro]", value: data.saldoTotal, icon: "mdi:piggy-bank-outline" },
                  { label: "Nivel de Endeudamiento", value: data.nivelEndeudamiento, icon: "mdi:percent-outline" },
              ]);
+             // Evaluamos si el usuario ya cuenta con un ingreso registrado en la BD al iniciar sesión
+             if (data.ingresoMensual && data.ingresoMensual !== "$0.0" && data.ingresoMensual !== "0" && data.ingresoMensual !== "Cargando...") {
+                 localStorage.setItem("csvCargado", "true");
+             }
          })
          .catch((err) => {
              console.error("No se pudieron cargar los datos financieros:", err);

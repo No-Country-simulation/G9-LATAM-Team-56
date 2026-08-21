@@ -5,6 +5,7 @@ const API_URL = 'http://localhost:8080/api/csv';
 const AUTH_URL = 'http://localhost:8080/api/auth';
 const PERFIL_URL = 'http://localhost:8080/api/perfil';
 const DASHBOARD_URL = 'http://localhost:8080/api/dashboard';
+const ESTADISTICAS_URL = 'http://localhost:8080/api/estadisticas';
 
 export const uploadCsvFile = async (file, usuario) => {
   // Creamos un objeto FormData para enviar archivos y texto juntos
@@ -49,5 +50,24 @@ export const obtenerDashboard = async (usuarioNombre) => {
       error.response?.data?.error ||
       'Error al obtener los datos del dashboard'
     );
+  }
+};
+
+// FUNCIONES CENTRALIZADAS PARA LOGIN Y ESTADÍSTICAS
+export const loginUsuario = async (credentials) => {
+  try {
+    const response = await axios.post(`${AUTH_URL}/login`, credentials);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Error en el inicio de sesión');
+  }
+};
+
+export const obtenerEstadisticas = async (params) => {
+  try {
+    const response = await axios.get(ESTADISTICAS_URL, { params });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Error al obtener estadísticas');
   }
 };
