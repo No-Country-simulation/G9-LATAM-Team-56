@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.finance_ia.api.dto.recommendation.RecommendationResult;
 import com.finance_ia.api.dto.recommendation.RecommendationResultDto;
@@ -44,7 +45,7 @@ public class CsvService {
         this.analisisRepository = analisisRepository;
     }
 
-    // Modificamos el metodo para que ahora reciba también el nombre de la persona
+    // Modificamos el mtodo para que ahora reciba también el nombre de la persona
     public CsvResponse analizarYGuardarCsv(MultipartFile file, String nombreUsuario) {
 
         try (
@@ -86,43 +87,67 @@ public class CsvService {
                 transacciones.add(transaccion);
             }
 
+            // Identificar el último mes presente en el CSV
+            LocalDate fechaMasReciente = transacciones.stream()
+                    .map(TransaccionRequest::getFecha)
+                    .max(LocalDate::compareTo)
+                    .orElse(LocalDate.now());
+            int mesObjetivo = fechaMasReciente.getMonthValue();
+            int anioObjetivo = fechaMasReciente.getYear();
+
+            // Definir el rango del mes actual (desde el día 1 hasta el día actual de ese mes)
+            // Si el mes objetivo coincide con el mes actual del sistema, limitamos hasta LocalDate.now()
+            // De lo contrario, si es un mes histórico cerrado, toma el mes completo.
+            LocalDate inicioMes = LocalDate.of(anioObjetivo, mesObjetivo, 1);
+            LocalDate finMes;
+
+            LocalDate hoySistema = LocalDate.now();
+            if (mesObjetivo == hoySistema.getMonthValue() && anioObjetivo == hoySistema.getYear()) {
+                finMes = hoySistema; // Limita hasta el día actual del mes en curso
+            } else {
+                finMes = inicioMes.withDayOfMonth(inicioMes.lengthOfMonth()); // Mes completo histórico
+            }
+
+            // Filtrar transacciones del último mes pero acotadas desde el día 1 hasta el fin calculado (día actual o fin de mes)
+            List<TransaccionRequest> transaccionesUltimoMes = transacciones.stream()
+                    .filter(t -> {
+                        LocalDate f = t.getFecha();
+                        return !f.isBefore(inicioMes) && !f.isAfter(finMes);
+                    })
+                    .toList();
+
             // Clasificar las transacciones llamando al servicio financiero
             ClasificacionTransaccionesRequest clasificacionRequest = new ClasificacionTransaccionesRequest();
             clasificacionRequest.setTransacciones(transacciones);
-
             ClasificacionTransaccionesResponse clasificacionResponse =
                     analisisFinancieroService.clasificarTransacciones(clasificacionRequest);
-
             List<TransaccionResponse> transaccionesCategorizadas =
                     clasificacionResponse.getTransacciones();
 
-            // Calcular el gasto total sumando todas las transacciones
-            double gastoTotal = 0.0;
+            // Calcular Gasto y Saldo con las transacciones filtradas del período correcto (día 1 al día actual)
+            double gastoTotalUltimoMes = transaccionesUltimoMes.stream()
+                    .mapToDouble(TransaccionRequest::getValor)
+                    .sum();
 
-            Map<String, Double> resumenGastos = new HashMap<>();
+            double saldoTotalUltimoMes = ingresoMensual - gastoTotalUltimoMes;
 
-            for (TransaccionResponse transaccion : transaccionesCategorizadas) {
-
-                double valor = transaccion.getValor();
-
-                gastoTotal += valor;
-
-                resumenGastos.merge(
-                        transaccion.getCategoria(),
-                        valor,
-                        Double::sum
-                );
-            }
-
-            // CALCULAR EL SALDO TOTAL (Ingreso menos la suma de las transacciones)
-            double saldoTotalCalculado = ingresoMensual - gastoTotal;
+            // Agrupar usando las categorías reales ya procesadas, respetando el mismo filtro de fechas
+            Map<String, Double> resumenGastos = transaccionesCategorizadas.stream()
+                    .filter(t -> {
+                        LocalDate f = t.getFecha();
+                        return !f.isBefore(inicioMes) && !f.isAfter(finMes);
+                    })
+                    .collect(Collectors.groupingBy(
+                            TransaccionResponse::getCategoria, // Usamos la categoría real del Enum
+                            Collectors.summingDouble(TransaccionResponse::getValor)
+                    ));
 
             // Obtener el perfil financiero del usuario
             PerfilFinancieroRequest perfilRequest = new PerfilFinancieroRequest();
             perfilRequest.setIngreso_mensual(ingresoMensual);
             perfilRequest.setNivel_endeudamiento(nivelEndeudamiento);
             perfilRequest.setFrecuencia_ahorro(frecuenciaAhorro);
-            perfilRequest.setGasto_total(gastoTotal);
+            perfilRequest.setGasto_total(gastoTotalUltimoMes);
 
             PerfilFinancieroResponse perfilResponse =
                     analisisFinancieroService.obtenerPerfil(perfilRequest);
@@ -149,7 +174,8 @@ public class CsvService {
                 entidadAnalisis.setFrecuenciaAhorro(frecuenciaAhorro);
                 entidadAnalisis.setPerfilFinanciero(perfilResponse.getPerfil_financiero());
                 entidadAnalisis.setProbabilidad(perfilResponse.getProbabilidad());
-                entidadAnalisis.setSaldoTotal(saldoTotalCalculado);
+                entidadAnalisis.setSaldoTotal(saldoTotalUltimoMes);
+                entidadAnalisis.setGastoTotal(gastoTotalUltimoMes);
 
                 // Vaciamos la lista existente y añadimos los nuevos elementos
                 entidadAnalisis.getTransacciones().clear();
@@ -187,7 +213,8 @@ public class CsvService {
                 entidadAnalisis.setFrecuenciaAhorro(frecuenciaAhorro);
                 entidadAnalisis.setPerfilFinanciero(perfilResponse.getPerfil_financiero());
                 entidadAnalisis.setProbabilidad(perfilResponse.getProbabilidad());
-                entidadAnalisis.setSaldoTotal(saldoTotalCalculado);
+                entidadAnalisis.setSaldoTotal(saldoTotalUltimoMes);
+                entidadAnalisis.setGastoTotal(gastoTotalUltimoMes);
 
                 List<TransaccionEntity> listaTransaccionesEntities = new ArrayList<>();
                 for (int i = 0; i < transaccionesCategorizadas.size(); i++) {

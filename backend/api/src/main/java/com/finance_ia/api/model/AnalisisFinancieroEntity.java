@@ -20,6 +20,7 @@ public class AnalisisFinancieroEntity {
     private String perfilFinanciero;
     private double probabilidad;
     private Double saldoTotal;
+    private Double gastoTotal;
 
     @OneToMany(mappedBy = "analisisFinanciero", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TransaccionEntity> transacciones;
@@ -91,6 +92,9 @@ public class AnalisisFinancieroEntity {
 
     public Double getSaldoTotal() { return saldoTotal; }
     public void setSaldoTotal(Double saldoTotal) { this.saldoTotal = saldoTotal; }
+
+    public Double getGastoTotal() { return gastoTotal; }
+    public void setGastoTotal(Double gastoTotal) { this.gastoTotal = gastoTotal; }
 
     public List<RecomendacionEntity> getRecomendaciones() {return recomendaciones;}
     public void setRecomendaciones(List<RecomendacionEntity> recomendaciones) {this.recomendaciones = recomendaciones;}
