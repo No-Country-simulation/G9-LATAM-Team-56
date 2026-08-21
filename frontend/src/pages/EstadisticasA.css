@@ -45,20 +45,7 @@
   font-family: var(--font-texto);
 }
 
-/* .estadisticas-hero,
-.estadisticas-content {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 20px;
-  padding-left: 40px;
-  padding-right: 40px;
-} */
 
-/* .estadisticas-hero {
-  padding-top: 30px;
-  padding-bottom: 10px;
-  align-items: center;
-} */
 
 .estadisticas-hero-title {
   text-align: center;
@@ -183,10 +170,7 @@
   background-color: var(--color-primario-azul);
 }
 
-/* .estadisticas-content {
-  padding-top: 20px;
-  padding-bottom: 50px;
-} */
+
 
 .grafico-card {
   background-color: var(--color-terciario);
@@ -242,6 +226,7 @@
   gap: 16px;
   min-width: 0;
   width: 100%;
+  align-items: center;
 }
 
 .resumen-card {
@@ -347,7 +332,6 @@
   gap: 16px;
   padding-left: 24px;
   border-left: 2px solid rgba(255, 255, 255, 0.15); /* La línea vertical */
-  justify-content: space-between;
   height: 100%;
   box-sizing: border-box;
 }
