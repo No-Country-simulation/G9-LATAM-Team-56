@@ -81,6 +81,10 @@ public class CsvService {
                     nivelEndeudamiento = Double.parseDouble(record.get("nivel_endeudamiento"));
                     frecuenciaAhorro = record.get("frecuencia_ahorro");
                     divisa = record.get("divisa");
+
+                    if (divisa != null) {
+                        divisa = divisa.trim();
+                    }
                     primeraFila = false;
                 }
 
