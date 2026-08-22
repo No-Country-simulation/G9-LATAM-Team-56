@@ -124,34 +124,16 @@ export const RECOMENDACIONES_MOCK = [
   }
 ];
 
-export const obtenerGaugeData = (perfil) => {
-  switch (perfil?.trim().toLowerCase()) {
-    case "saludable":
-      return [
-        { name: "En riesgo", value: 20, color: "#990000" },
-        { name: "En observación", value: 30, color: "#D97706" },
-        { name: "Saludable", value: 50, color: "#2D6A4F" },
-      ];
-
-    case "en observación":
-      return [
-        { name: "En riesgo", value: 30, color: "#990000" },
-        { name: "En observación", value: 40, color: "#D97706" },
-        { name: "Saludable", value: 30, color: "#2D6A4F" },
-      ];
-
-    case "en riesgo":
-      return [
-        { name: "En riesgo", value: 50, color: "#990000" },
-        { name: "En observación", value: 30, color: "#D97706" },
-        { name: "Saludable", value: 20, color: "#2D6A4F" },
-      ];
-
-    default:
-      return [
-        { name: "En riesgo", value: 33.33, color: "#990000" },
-        { name: "En observación", value: 33.33, color: "#D97706" },
-        { name: "Saludable", value: 33.34, color: "#2D6A4F" },
-      ];
-  }
+/**
+ * Retorna los 3 arcos del velocímetro con sus nombres y colores correspondientes:
+ * - En riesgo: Rojo (#EF4444)
+ * - En observación: Amarillo (#F59E0B)
+ * - Saludable: Verde (#10B981)
+ */
+export const obtenerGaugeData = () => {
+  return [
+    { name: "En Riesgo", value: 33.33, color: "#EF4444" },      // Arco 0 - 33.33% (Rojo)
+    { name: "En Observación", value: 33.33, color: "#F59E0B" }, // Arco 33.33% - 66.66% (Amarillo)
+    { name: "Saludable", value: 33.34, color: "#10B981" },      // Arco 66.66% - 100% (Verde)
+  ];
 };

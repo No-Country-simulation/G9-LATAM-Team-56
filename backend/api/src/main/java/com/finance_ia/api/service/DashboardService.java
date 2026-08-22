@@ -22,12 +22,14 @@ public class DashboardService {
 
     private final AnalisisFinancieroRepository analisisRepository;
     private final TransaccionRepository transaccionRepository;
+    private final PerfilFinancieroMapper perfilMapper;
 
     public DashboardService(
-            AnalisisFinancieroRepository analisisRepository, TransaccionRepository transaccionRepository
+        AnalisisFinancieroRepository analisisRepository, TransaccionRepository transaccionRepository, PerfilFinancieroMapper perfilMapper
     ) {
         this.analisisRepository = analisisRepository;
         this.transaccionRepository = transaccionRepository;
+        this.perfilMapper = perfilMapper;
     }
 
     public DashboardResponse obtenerDashboard(
@@ -52,6 +54,7 @@ public class DashboardService {
                     0.0,              // ingresoMensual
                     0.0,              // nivelEndeudamiento
                     "Sin registrar",  // frecuenciaAhorro
+                    "Sin registrar",  // divisa
                     0.0,              // saldoTotal
                     new HashMap<>(),  // resumenGastos vacíos
                     List.of(),        // transacciones vacías
@@ -78,11 +81,12 @@ public class DashboardService {
                 );
 
         return new DashboardResponse(
-                analisis.getPerfilFinanciero(),
+                perfilMapper.toResponse(analisis.getPerfilFinanciero()),
                 analisis.getProbabilidad(),
                 analisis.getIngresoMensual(),
                 analisis.getNivelEndeudamiento(),
                 analisis.getFrecuenciaAhorro(),
+                analisis.getDivisa(),
                 analisis.getSaldoTotal(),
                 resumenGastos,
                 transacciones,

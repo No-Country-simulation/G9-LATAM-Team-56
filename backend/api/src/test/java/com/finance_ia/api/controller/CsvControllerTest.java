@@ -22,10 +22,10 @@ public class CsvControllerTest {
     @Test
     public void testSubirCsvExitoso() throws Exception {
         // 1. Creamos el contenido simulado de un archivo CSV con el formato de fecha correcto (d/M/yyyy)
-        String contenidoCsv = "ingreso_mensual,nivel_endeudamiento,frecuencia_ahorro,descripcion,valor,fecha\n" +
-                "45000,25,Media,Dominos,498.34,12/02/2021\n" +
-                "45000,25,Media,Samsung Store,3134.80,12/03/2021\n" +
-                "45000,25,Media,Apple Music,744.99,6/02/2021";
+        String contenidoCsv = "ingreso_mensual,nivel_endeudamiento,frecuencia_ahorro,divisa,descripcion,valor,fecha\n" +
+                "45000,25,Media,ARS,Dominos,498.34,12/02/2021\n" +
+                "45000,25,Media,ARS,Samsung Store,3134.80,12/03/2021\n" +
+                "45000,25,Media,ARS,Apple Music,744.99,6/02/2021";
 
         // 2. Creamos un archivo Multipart simulado (nombre del campo en el backend: "file")
         MockMultipartFile archivoCsv = new MockMultipartFile(
