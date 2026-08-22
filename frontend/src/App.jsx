@@ -4,6 +4,7 @@ import Perfil from './pages/Perfil';
 import EstadisticasA from './pages/EstadisticasA';
 import Recomendaciones from './pages/Recomendaciones';
 import Dashboard from './pages/Dashboard';
+import NotFound from "./components/NotFound";
 
 export default function App() {
   return (
@@ -19,10 +20,13 @@ export default function App() {
         <Route path="/estadisticas" element={<EstadisticasA />} />
 
         {/* Ruta para Recomendaciones */}
-                <Route path="/recomendaciones" element={<Recomendaciones />} />
+        <Route path="/recomendaciones" element={<Recomendaciones />} />
 
         {/* Ruta para Dashboard */}
-                <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+
+        {/* Ruta comodín para capturar cualquier URL inexistente */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
