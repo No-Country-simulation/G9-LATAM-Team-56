@@ -1,37 +1,49 @@
 package com.finance_ia.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 import java.time.LocalDate;
 
 public class TransaccionRequest {
 
-    private String descripcion;
-    private Double valor;
-    private LocalDate fecha;
+        @NotBlank(message = "La descripción de la transacción es obligatoria.")
+        private String descripcion;
 
-    public TransaccionRequest() {
-    }
+        @NotNull(message = "El valor de la transacción es obligatorio.")
+        @Positive(message = "El valor de la transacción debe ser mayor que 0.")
+        private Double valor;
 
-    public String getDescripcion() {
-        return descripcion;
-    }
+        @JsonDeserialize(using = LocalDateIgnoreInvalidDeserializer.class)
+        private LocalDate fecha;
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
+        public TransaccionRequest() {
+        }
 
-    public Double getValor() {
-        return valor;
-    }
+        public String getDescripcion() {
+            return descripcion;
+        }
 
-    public void setValor(Double valor) {
-        this.valor = valor;
-    }
+        public void setDescripcion(String descripcion) {
+            this.descripcion = descripcion;
+        }
 
-    public LocalDate getFecha() {
-        return fecha;
-    }
+        public Double getValor() {
+            return valor;
+        }
 
-    public void setFecha(LocalDate fecha) {
-        this.fecha = fecha;
-    }
+        public void setValor(Double valor) {
+            this.valor = valor;
+        }
+
+        public LocalDate getFecha() {
+            return fecha;
+        }
+
+        public void setFecha(LocalDate fecha) {
+            this.fecha = fecha;
+        }
 }
