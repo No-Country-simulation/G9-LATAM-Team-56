@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { loginUsuario } from '/services/api'
 import axios from "axios";
 import "./Login.css";
 import logo from "../assets/img/logo-financeai.jpg";
@@ -35,14 +36,15 @@ function Login() {
 
     try {
       // Petición al backend en Spring Boot
-      const response = await axios.post("http://localhost:8080/api/auth/login", {
+      const response = await loginUsuario({
         email,
         password
       });
 
       // Guardamos datos en localStorage y redirigimos
-      localStorage.setItem("usuarioNombre", response.data.nombre);
-      localStorage.setItem("usuarioEmail", response.data.email);
+      localStorage.setItem("usuarioNombre", response.nombre);
+      localStorage.setItem("usuarioEmail", response.email);
+      localStorage.setItem("csvCargado", "false");
 
       navigate("/dashboard");
 

@@ -211,7 +211,7 @@ public class AnalisisFinancieroService {
             case "EN OBSERVACION" ->
                 FinancialProfile.EN_OBSERVACION;
 
-            case "RIESGO" ->
+            case "EN RIESGO" ->
                 FinancialProfile.RIESGO;
 
             default ->

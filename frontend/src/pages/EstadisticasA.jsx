@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { obtenerEstadisticas } from "/services/api";
+import { useNavigate } from "react-router-dom";
+import ModalBloqueo from "../components/Bloqueo";
 import axios from "axios";
 import { Icon } from "@iconify/react";
 import {
@@ -15,6 +18,19 @@ import UserBadge from "../components/UserBadge";
 import "./EstadisticasA.css";
 
 function EstadisticasA() {
+  const [bloqueado, setBloqueado] = useState(false);
+
+  const navigate = useNavigate();
+
+  // VERIFICAR SI EL CSV ESTÁ CARGADO
+  useEffect(() => {
+   const csvCargado = localStorage.getItem("csvCargado") === "true";
+     // Si intentan entrar sin tener el CSV cargado mostramos el pop-up
+     if (!csvCargado) {
+       setBloqueado(true); // Activa el bloque si no hay CSV
+     }
+   }, [navigate]);
+
   // Usuario autenticado real
   const usuarioActual = localStorage.getItem("usuarioNombre") || sessionStorage.getItem("usuarioNombre") || "Invitado";
 
@@ -88,10 +104,12 @@ function EstadisticasA() {
 
     const cargarTarjetas = async () => {
       try {
-        const res = await axios.get(`http://localhost:8080/api/estadisticas`, {
-          params: { usuario: usuarioActual, inicio: fechaInicioFiltro, fin: fechaFinFiltro }
+        const data = await obtenerEstadisticas({
+          usuario: usuarioActual,
+          inicio: fechaInicioFiltro,
+          fin: fechaFinFiltro
         });
-        setTopCategorias(res.data.top3 || []);
+        setTopCategorias(data.top3 || []);
       } catch (error) {
         console.error("Error al cargar tarjetas:", error);
       }
@@ -132,11 +150,13 @@ function EstadisticasA() {
       const fFin = fin.toISOString().split("T")[0];
 
       try {
-        const res = await axios.get(`http://localhost:8080/api/estadisticas`, {
-          params: { usuario: usuarioActual, inicio: fInicio, fin: fFin }
+        const data = await obtenerEstadisticas({
+          usuario: usuarioActual,
+          inicio: fInicio,
+          fin: fFin
         });
 
-        const transacciones = res.data.transaccionesDetalladas || [];
+        const transacciones = data.transaccionesDetalladas || [];
         const datosProcesados = procesarDatosGrafico(transacciones, rangoGrafico, hoy);
         setDatosGrafico(datosProcesados);
       } catch (error) {
@@ -281,7 +301,10 @@ function EstadisticasA() {
   };
 
   return (
-    <div className="estadisticas-layout">
+    <div className="estadisticas-layout" style={{ position: "relative" }}>
+      {/* Si está bloqueado, se muestra el pop-up encima de toda la vista */}
+      {bloqueado && <ModalBloqueo />}
+
       <Sidebar />
 
       <div className="estadisticas-main">

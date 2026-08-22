@@ -51,6 +51,12 @@ function Dashboard() {
         // Solo actualizar el estado si el componente sigue montado
         if (isMounted) {
           setDashboardData(data);
+
+          // Si el usuario tiene un perfil financiero válido, actualizamos el localStorage
+          const tienePerfilValido = data && data.perfil_financiero && data.perfil_financiero !== "Desconocido" && data.perfil_financiero !== "Sin determinar";
+          if (tienePerfilValido) {
+            localStorage.setItem("csvCargado", "true");
+          }
         }
       } catch (err) {
         console.error("Error al cargar dashboard:", err);
@@ -208,7 +214,7 @@ function Dashboard() {
               onMouseOver={(e) => e.target.style.backgroundColor = "#1d4ed8"}
               onMouseOut={(e) => e.target.style.backgroundColor = "#2563eb"}
             >
-              Ir a la ventana Perfil
+              Ir a Perfil
             </button>
           </div>
         </div>

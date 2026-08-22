@@ -48,6 +48,17 @@ function Perfil() {
                  { label: "Saldo del Mes [Ahorro]", value: data.saldoTotal, icon: "mdi:piggy-bank-outline" },
                  { label: "Nivel de Endeudamiento", value: data.nivelEndeudamiento, icon: "mdi:percent-outline" },
              ]);
+             // Evaluamos si el usuario ya cuenta con un ingreso registrado en la BD al iniciar sesión
+             const tieneDatos = data.ingresoMensual &&
+                                data.ingresoMensual !== "$0.0" &&
+                                data.ingresoMensual !== "$0" &&
+                                data.ingresoMensual !== "Cargando...";
+
+             if (tieneDatos) {
+                 localStorage.setItem("csvCargado", "true");
+             } else {
+                 localStorage.setItem("csvCargado", "false"); // Forzamos a falso si no hay datos reales
+             }
          })
          .catch((err) => {
              console.error("No se pudieron cargar los datos financieros:", err);
@@ -59,6 +70,7 @@ function Perfil() {
                  { label: "Saldo del Mes [Ahorro]", value: "$0.00", icon: "mdi:piggy-bank-outline" },
                  { label: "Nivel de Endeudamiento", value: "0%", icon: "mdi:percent-outline" },
              ]);
+             localStorage.setItem("csvCargado", "false"); // Si falla, marcamos que no hay datos
          });
        }
   }, []);
