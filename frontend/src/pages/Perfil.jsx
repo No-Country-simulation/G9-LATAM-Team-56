@@ -53,7 +53,7 @@ function Perfil() {
              console.error("No se pudieron cargar los datos financieros:", err);
              // Valores de respaldo en caso de que ocurra un error de conexión
              setCuentaInfo([
-                 { label: "Moneda", value: "USD Dólar", icon: "mdi:currency-usd" },
+                 { label: "Moneda", value: "Sin registrar", icon: "mdi:currency-usd" },
                  { label: "Ingreso Mensual", value: "$0.0", icon: "mdi:cash" },
                  { label: "Gastos Total del Mes", value: "$0.0", icon: "mdi:wallet-outline" },
                  { label: "Saldo del Mes [Ahorro]", value: "$0.00", icon: "mdi:piggy-bank-outline" },

@@ -54,6 +54,7 @@ public class DashboardService {
                     0.0,              // ingresoMensual
                     0.0,              // nivelEndeudamiento
                     "Sin registrar",  // frecuenciaAhorro
+                    "Sin registrar",  // divisa
                     0.0,              // saldoTotal
                     new HashMap<>(),  // resumenGastos vacíos
                     List.of(),        // transacciones vacías
@@ -85,6 +86,7 @@ public class DashboardService {
                 analisis.getIngresoMensual(),
                 analisis.getNivelEndeudamiento(),
                 analisis.getFrecuenciaAhorro(),
+                analisis.getDivisa(),
                 analisis.getSaldoTotal(),
                 resumenGastos,
                 transacciones,
