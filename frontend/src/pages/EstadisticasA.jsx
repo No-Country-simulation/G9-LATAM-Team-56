@@ -150,7 +150,7 @@ function EstadisticasA() {
       const fFin = fin.toISOString().split("T")[0];
 
       try {
-        const res = await obtenerEstadisticas({
+        const data = await obtenerEstadisticas({
           usuario: usuarioActual,
           inicio: fInicio,
           fin: fFin
