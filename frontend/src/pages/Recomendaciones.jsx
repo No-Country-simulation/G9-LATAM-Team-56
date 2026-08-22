@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import Sidebar from "../components/Sidebar";
 import UserBadge from "../components/UserBadge";
+import ModalBloqueo from "../components/Bloqueo";
 import { obtenerDashboard } from "/services/api";
 import "./Recomendaciones.css";
 
@@ -58,8 +59,18 @@ export default function Recomendaciones() {
   const [perfilFinanciero, setPerfilFinanciero] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [bloqueado, setBloqueado] = useState(false);
 
   useEffect(() => {
+
+    // VERIFICAR SI EL CSV ESTÁ CARGADO
+    const csvCargado = localStorage.getItem("csvCargado") === "true";
+    if (!csvCargado) {
+      setBloqueado(true);
+      setLoading(false);
+      return; // Detenemos la ejecución para que no intente cargar datos si no hay CSV
+    }
+
     const nombreUsuario = localStorage.getItem("usuarioNombre");
 
     if (!nombreUsuario) {
@@ -89,7 +100,9 @@ export default function Recomendaciones() {
   const { bgClass, iconLeft } = getStatusConfig(perfilFinanciero);
 
   return (
-    <div className="recomendaciones-layout">
+    <div className="recomendaciones-layout" style={{ position: "relative" }}>
+      {bloqueado && <ModalBloqueo />}
+
       <Sidebar />
 
       <div className="recomendaciones-main">

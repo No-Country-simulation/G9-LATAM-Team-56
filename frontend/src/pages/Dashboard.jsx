@@ -186,7 +186,7 @@ function Dashboard() {
               onMouseOver={(e) => e.target.style.backgroundColor = "#1d4ed8"}
               onMouseOut={(e) => e.target.style.backgroundColor = "#2563eb"}
             >
-              Ir a la ventana Perfil
+              Ir a Perfil
             </button>
           </div>
         </div>
