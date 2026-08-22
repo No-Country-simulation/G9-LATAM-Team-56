@@ -28,7 +28,7 @@ public class PerfilFinancieroMapper {
       case "EN OBSERVACION" ->
           "En observación";
 
-      case "RIESGO" ->
+      case "EN RIESGO" ->
           "En riesgo";
 
       default ->

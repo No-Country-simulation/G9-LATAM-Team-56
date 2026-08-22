@@ -19,7 +19,7 @@ const getStatusConfig = (perfilFinanciero) => {
   const perfil = normalizar(perfilFinanciero);
 
   switch (perfil) {
-    case "riesgo":
+    case "en riesgo":
       return { bgClass: "status-bad-bg", iconLeft: "mdi:emoticon-dead" };
     case "en observacion":
       return { bgClass: "status-warning-bg", iconLeft: "ph:warning-fill" };
