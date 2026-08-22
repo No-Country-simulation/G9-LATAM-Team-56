@@ -311,6 +311,7 @@ public class FinancialValidationService {
             String ingresoMensual,
             String nivelEndeudamiento,
             String frecuenciaAhorro,
+            String divisa,
             String descripcion,
             String valor,
             String fecha,
@@ -333,6 +334,12 @@ public class FinancialValidationService {
 
         validarFrecuenciaAhorroCsv(
                 frecuenciaAhorro,
+                row,
+                errors
+        );
+
+        validarDivisa(
+                divisa,
                 row,
                 errors
         );
@@ -571,6 +578,24 @@ public class FinancialValidationService {
                     "La frecuencia de ahorro debe ser alta, media o baja.",
                     row
             ));
+        }
+    }
+
+    private void validarDivisa(
+            String divisa,
+            int row,
+            List<ErrorDetail> errors
+    ) {
+
+        if (divisa == null || divisa.trim().isEmpty()) {
+
+            errors.add(
+                    new ErrorDetail(
+                            "divisa",
+                            "La divisa es obligatoria.",
+                            row
+                    )
+            );
         }
     }
 }

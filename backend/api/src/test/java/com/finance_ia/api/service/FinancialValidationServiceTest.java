@@ -296,6 +296,97 @@ class FinancialValidationServiceTest {
     }
 
     // =========================================================
+    // FRECUENCIA DE AHORRO
+    // =========================================================
+
+    @Test
+    void debeAceptarDivisaValidaEnCsv() {
+
+        List<ErrorDetail> errors =
+                validationService.validarRegistroCsv(
+                        "5000",
+                        "50",
+                        "alta",
+                        "BOB",
+                        "Supermercado",
+                        "100",
+                        "22/08/2026",
+                        2
+                );
+
+        assertTrue(errors.isEmpty());
+    }
+
+    @Test
+    void debeRechazarDivisaVaciaEnCsv() {
+
+        List<ErrorDetail> errors =
+                validationService.validarRegistroCsv(
+                        "5000",
+                        "50",
+                        "alta",
+                        "",
+                        "Compra supermercado",
+                        "100",
+                        "20/08/2026",
+                        2
+                );
+
+        assertTrue(errors.stream()
+                .anyMatch(error ->
+                        error.field().equals("divisa")
+                                && error.message().equals(
+                                "La divisa es obligatoria."
+                        )
+                                && error.row() == 2
+                ));
+    }
+
+    @Test
+    void debeRechazarDivisaNullEnCsv() {
+
+        List<ErrorDetail> errors =
+                validationService.validarRegistroCsv(
+                        "5000",
+                        "50",
+                        "alta",
+                        null,
+                        "Compra supermercado",
+                        "100",
+                        "20/08/2026",
+                        2
+                );
+
+        assertTrue(errors.stream()
+                .anyMatch(error ->
+                        error.field().equals("divisa")
+                                && error.message().equals(
+                                "La divisa es obligatoria."
+                        )
+                                && error.row() == 2
+                ));
+    }
+
+    @Test
+    void debeAceptarDivisaConEspaciosEnCsv() {
+
+        List<ErrorDetail> errors =
+                validationService.validarRegistroCsv(
+                        "5000",
+                        "50",
+                        "alta",
+                        "  BOB  ",
+                        "Supermercado",
+                        "100",
+                        "22/08/2026",
+                        2
+                );
+
+        assertTrue(errors.isEmpty());
+    }
+
+
+    // =========================================================
     // TRANSACCIONES
     // =========================================================
 
