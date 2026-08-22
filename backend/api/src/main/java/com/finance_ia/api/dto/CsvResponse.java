@@ -5,8 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
-@Getter
-@Setter
+
 public class CsvResponse {
 
     private double ingreso_mensual;
@@ -65,5 +64,12 @@ public class CsvResponse {
         this.transacciones = transacciones;
     }
 
-    
+
+    public List<RecommendationResultDto> getRecomendaciones() {
+        return recomendaciones;
+    }
+
+    public void setRecomendaciones(List<RecommendationResultDto> recomendaciones) {
+        this.recomendaciones = recomendaciones;
+    }
 }
