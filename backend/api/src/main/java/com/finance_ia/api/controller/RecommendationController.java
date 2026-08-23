@@ -8,11 +8,17 @@ import com.finance_ia.api.model.recommendation.RecommendationRequest;
 import com.finance_ia.api.model.recommendation.RecommendationResponse;
 import com.finance_ia.api.model.recommendation.TopCategory;
 import com.finance_ia.api.service.recommendation.RecommendationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(
+        name = "07. Recomendaciones",
+        description = "Endpoint experimental utilizado para pruebas del motor de recomendaciones."
+)
 @RestController
 @RequestMapping("/api/recomendaciones")
 public class RecommendationController {
@@ -31,6 +37,15 @@ public class RecommendationController {
         this.recommendationService = recommendationService;
     }
 
+    @Operation(
+            summary = "Generar recomendaciones",
+            description = """
+            Endpoint utilizado para pruebas aisladas del motor
+            de recomendaciones. Actualmente las recomendaciones
+            son obtenidas mediante el flujo principal de análisis
+            financiero y dashboard.
+            """
+    )
     @PostMapping
     public ResponseEntity<RecommendationResponseDto> generateRecommendations(
             @RequestBody RecommendationRequestDto requestDto

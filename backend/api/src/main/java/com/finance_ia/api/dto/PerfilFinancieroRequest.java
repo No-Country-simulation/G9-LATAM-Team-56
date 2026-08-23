@@ -1,11 +1,20 @@
 package com.finance_ia.api.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 
+@Schema(
+        name = "PerfilFinancieroRequest",
+        description = "Datos financieros utilizados para evaluar el perfil financiero del usuario."
+)
 public class PerfilFinancieroRequest {
 
+    @Schema(
+            description = "Ingreso mensual del usuario.",
+            example = "4500"
+    )
     @NotNull(message = "El ingreso mensual es obligatorio.")
     @DecimalMin(
             value = "0.0", inclusive = false,
@@ -13,6 +22,12 @@ public class PerfilFinancieroRequest {
     )
     private Double ingreso_mensual;
 
+    @Schema(
+            description = "Porcentaje de endeudamiento del usuario.",
+            example = "25",
+            minimum = "0",
+            maximum = "100"
+    )
     @NotNull(message = "El nivel de endeudamiento es obligatorio.")
     @DecimalMin(
             value = "0.0",
@@ -24,9 +39,18 @@ public class PerfilFinancieroRequest {
     )
     private Double nivel_endeudamiento;
 
+    @Schema(
+            description = "Frecuencia con la que el usuario realiza ahorros.",
+            example = "MEDIA"
+    )
     @NotNull(message = "La frecuencia de ahorro es obligatoria.")
     private String frecuencia_ahorro;
 
+    @Schema(
+            description = "Gasto total del usuario.",
+            example = "3500",
+            minimum = "0"
+    )
     @NotNull(message = "El gasto total es obligatorio.")
     @DecimalMin(
             value = "0.0",
