@@ -43,7 +43,6 @@ public class PerfilController {
         Optional<AnalisisFinancieroEntity> analisisOpt = analisisFinancieroRepository.findByUsuarioNombre(usuario.getNombre());
 
         Map<String, Object> datosFinancieros = new HashMap<>();
-        datosFinancieros.put("moneda", "USD Dólar");
 
         // Verificamos si encontramos datos en la tabla Analisis_financiero
         if (analisisOpt.isPresent()) {
@@ -70,12 +69,14 @@ public class PerfilController {
             datosFinancieros.put("nivelEndeudamiento", analisis.getNivelEndeudamiento() + "%");
             datosFinancieros.put("saldoTotal", saldoFormateado);
             datosFinancieros.put("gastoTotal", gastoFormateado);
+            datosFinancieros.put("moneda", analisis.getDivisa() != null ? analisis.getDivisa(): "Sin registrar");
         } else {
             // Si el usuario aún no ha subido ningún CSV o no hay registros, enviamos valores por defecto en 0
             datosFinancieros.put("ingresoMensual", "$0");
             datosFinancieros.put("nivelEndeudamiento", "0%");
             datosFinancieros.put("saldoTotal", "$0");
             datosFinancieros.put("gastoTotal", "$0");
+            datosFinancieros.put("moneda", "Sin registrar");
         }
 
         return ResponseEntity.ok(datosFinancieros);

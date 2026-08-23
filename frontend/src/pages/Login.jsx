@@ -44,6 +44,7 @@ function Login() {
       // Guardamos datos en localStorage y redirigimos
       localStorage.setItem("usuarioNombre", response.nombre);
       localStorage.setItem("usuarioEmail", response.email);
+      localStorage.setItem("csvCargado", "false");
 
       navigate("/dashboard");
 

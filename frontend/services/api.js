@@ -10,8 +10,9 @@ const ESTADISTICAS_URL = 'http://localhost:8080/api/estadisticas';
 export const uploadCsvFile = async (file, usuario) => {
   // Creamos un objeto FormData para enviar archivos y texto juntos
   const formData = new FormData();
+
   formData.append('file', file);
-  formData.append('usuario', usuario); // <- Aquí enviamos el parámetro que pide tu @RequestParam("usuario")
+  formData.append('usuario', usuario);
 
   try {
     const response = await axios.post(`${API_URL}/upload`, formData, {
@@ -19,9 +20,27 @@ export const uploadCsvFile = async (file, usuario) => {
         'Content-Type': 'multipart/form-data',
       },
     });
+
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || 'Error al conectar con el servidor');
+    const data = error.response?.data;
+
+    const uploadError = new Error(
+      data?.message || 'Error al conectar con el servidor'
+    );
+
+    // Clasificamos el error para que el frontend sepa cómo presentarlo
+    uploadError.type =
+      data?.error === 'CSV_VALIDATION_ERROR'
+        ? 'validation'
+        : 'server';
+
+    // Conservamos información útil de la respuesta del backend
+    uploadError.status = data?.status || error.response?.status || null;
+    uploadError.code = data?.error || null;
+    uploadError.errors = data?.errors || [];
+
+    throw uploadError;
   }
 };
 

@@ -1,5 +1,5 @@
 import { Icon } from '@iconify/react';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from 'react-router-dom'; // Importamos hooks de navegación
 import logo from '../assets/img/logo-financeai.jpg';
 import './Sidebar.css';
@@ -26,13 +26,19 @@ function Sidebar() {
     const estoyEnPerfil = location.pathname === '/perfil';
 
     // Verificamos si ya se cargó un CSV válido (puedes guardar esta bandera en localStorage al subir el archivo con éxito)
-    const csvCargado = localStorage.getItem("csvCargado") === "true";
+    const csvCargado = localStorage.getItem("csvCargado");
+
+    console.log("Ruta actual:", location.pathname, "¿Es perfil?:", estoyEnPerfil);
+    console.log("Valor de csvCargado en localStorage:", csvCargado);
+    console.log("Ruta destino:", path);
 
     // Si estoy en perfil y quiero ir a otra vista sin haber cargado un CSV válido, bloqueo e interrumpo la navegación
-    if (estoyEnPerfil && !csvCargado && path !== '/perfil') {
+    if (estoyEnPerfil && csvCargado !== "true" && path !== '/perfil') {
+      console.log("¡BLOQUEADO! Mostrando modal...");
       setMostrarModalCsv(true);
       return;
     }
+    console.log("Navegando a:", path);
     navigate(path);
   };
 
@@ -115,7 +121,7 @@ function Sidebar() {
               <Icon icon="mdi:file-document-alert-outline" width="48" style={{ color: "#38bdf8", marginBottom: "15px" }} />
               <h3 style={{ fontSize: "1.25rem", marginBottom: "10px", fontWeight: "bold" }}>Acción Requerida</h3>
               <p style={{ color: "#94a3b8", fontSize: "0.95rem", lineHeight: "1.5", marginBottom: "25px" }}>
-                Para continuar con la navegación y habilitar las funciones del sistema, por favor cargue un documento CSV válido con las transacciones del usuario.
+                Para continuar con la navegación y habilitar las funciones del sistema, por favor cargue un documento CSV válido con sus transacciones.
               </p>
               <button
                 onClick={() => setMostrarModalCsv(false)}

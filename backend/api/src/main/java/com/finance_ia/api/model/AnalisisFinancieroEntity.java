@@ -1,9 +1,15 @@
 package com.finance_ia.api.model;
 
-import jakarta.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "analisis_financiero")
@@ -17,6 +23,7 @@ public class AnalisisFinancieroEntity {
     private double ingresoMensual;
     private double nivelEndeudamiento;
     private String frecuenciaAhorro;
+    private String divisa;
     private String perfilFinanciero;
     private double probabilidad;
     private Double saldoTotal;
@@ -67,6 +74,14 @@ public class AnalisisFinancieroEntity {
     }
     public void setFrecuenciaAhorro(String frecuenciaAhorro) {
         this.frecuenciaAhorro = frecuenciaAhorro;
+    }
+
+    public String getDivisa() {
+        return divisa;
+    }
+
+    public void setDivisa(String divisa) {
+        this.divisa = divisa;
     }
 
     public String getPerfilFinanciero() {

@@ -11,6 +11,7 @@ public record DashboardResponse(
         Double ingreso_mensual,
         Double nivel_endeudamiento,
         String frecuencia_ahorro,
+        String divisa,
         Double saldo_total,
         Map<String, Double> resumen_gastos,
         List<DashboardTransaccionDto> transacciones,

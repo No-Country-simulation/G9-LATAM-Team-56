@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { obtenerEstadisticas } from "/services/api";
+import { useNavigate } from "react-router-dom";
+import ModalBloqueo from "../components/Bloqueo";
 import axios from "axios";
 import { Icon } from "@iconify/react";
 import {
@@ -16,6 +18,19 @@ import UserBadge from "../components/UserBadge";
 import "./EstadisticasA.css";
 
 function EstadisticasA() {
+  const [bloqueado, setBloqueado] = useState(false);
+
+  const navigate = useNavigate();
+
+  // VERIFICAR SI EL CSV ESTÁ CARGADO
+  useEffect(() => {
+   const csvCargado = localStorage.getItem("csvCargado") === "true";
+     // Si intentan entrar sin tener el CSV cargado mostramos el pop-up
+     if (!csvCargado) {
+       setBloqueado(true); // Activa el bloque si no hay CSV
+     }
+   }, [navigate]);
+
   // Usuario autenticado real
   const usuarioActual = localStorage.getItem("usuarioNombre") || sessionStorage.getItem("usuarioNombre") || "Invitado";
 
@@ -30,7 +45,7 @@ function EstadisticasA() {
   const [datosGrafico, setDatosGrafico] = useState([]);
 
   const rangosBotones = [
-    { key: "hoy", label: "HOY" },
+    { key: "hoy", label: "DÍA" },
     { key: "semana", label: "SEMANA" },
     { key: "mes", label: "MES" },
     { key: "anio", label: "AÑO" },
@@ -41,17 +56,17 @@ function EstadisticasA() {
     if (!nombreCategoria) return "mdi:tag-outline";
     const cat = nombreCategoria.toLowerCase();
 
-    if (cat.includes("vivienda")) {return "mdi:mdi:home-outline";}
-    if (cat.includes("servicios")) {return "mdi:lightning-bolt-outline"}
-    if (cat.includes("alimentacion")) {return "mdi:cart-outline";}
-    if (cat.includes("transporte")) {return "mdi:car-outline";}
-    if (cat.includes("restaurant")) {return "mdi:silverware-fork-knife";}
-    if (cat.includes("entretenimiento")) {return "mdi:movie-open-outline";}
-    if (cat.includes("vestuario")) {return "mdi:tshirt-crew-outline";}
-    if (cat.includes("electronicos")) {return "mdi:laptop";}
-    if (cat.includes("salud")) {return "mdi:hospital-box-outline";}
-    if (cat.includes("educacion")) {return "mdi:school-outline";}
-    if (cat.includes("otros")) {return "mdi:dots-horizontal-circle-outline";}
+    if (cat.includes("vivienda")) { return "mdi:mdi:home-outline"; }
+    if (cat.includes("servicios")) { return "mdi:lightning-bolt-outline" }
+    if (cat.includes("alimentacion")) { return "mdi:cart-outline"; }
+    if (cat.includes("transporte")) { return "mdi:car-outline"; }
+    if (cat.includes("restaurant")) { return "mdi:silverware-fork-knife"; }
+    if (cat.includes("entretenimiento")) { return "mdi:movie-open-outline"; }
+    if (cat.includes("vestuario")) { return "mdi:tshirt-crew-outline"; }
+    if (cat.includes("electronicos")) { return "mdi:laptop"; }
+    if (cat.includes("salud")) { return "mdi:hospital-box-outline"; }
+    if (cat.includes("educacion")) { return "mdi:school-outline"; }
+    if (cat.includes("otros")) { return "mdi:dots-horizontal-circle-outline"; }
 
     return "mdi:tag-outline"; // Icono por defecto
   };
@@ -90,9 +105,9 @@ function EstadisticasA() {
     const cargarTarjetas = async () => {
       try {
         const data = await obtenerEstadisticas({
-            usuario: usuarioActual,
-            inicio: fechaInicioFiltro,
-            fin: fechaFinFiltro
+          usuario: usuarioActual,
+          inicio: fechaInicioFiltro,
+          fin: fechaFinFiltro
         });
         setTopCategorias(data.top3 || []);
       } catch (error) {
@@ -136,9 +151,9 @@ function EstadisticasA() {
 
       try {
         const data = await obtenerEstadisticas({
-            usuario: usuarioActual,
-            inicio: fInicio,
-            fin: fFin
+          usuario: usuarioActual,
+          inicio: fInicio,
+          fin: fFin
         });
 
         const transacciones = data.transaccionesDetalladas || [];
@@ -286,7 +301,10 @@ function EstadisticasA() {
   };
 
   return (
-    <div className="estadisticas-layout">
+    <div className="estadisticas-layout" style={{ position: "relative" }}>
+      {/* Si está bloqueado, se muestra el pop-up encima de toda la vista */}
+      {bloqueado && <ModalBloqueo />}
+
       <Sidebar />
 
       <div className="estadisticas-main">

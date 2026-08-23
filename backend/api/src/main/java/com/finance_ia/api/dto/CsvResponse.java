@@ -1,17 +1,15 @@
 package com.finance_ia.api.dto;
 
 import com.finance_ia.api.dto.recommendation.RecommendationResultDto;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
-@Getter
-@Setter
+
 public class CsvResponse {
 
     private double ingreso_mensual;
     private double nivel_endeudamiento;
     private String frecuencia_ahorro;
+    private String divisa;
     private String perfil_financiero;
     private double probabilidad;
     private List<TransaccionResponse> transacciones;
@@ -65,5 +63,20 @@ public class CsvResponse {
         this.transacciones = transacciones;
     }
 
-    
+    public String getDivisa() {
+        return divisa;
+    }
+
+    public void setDivisa(String divisa) {
+        this.divisa = divisa;
+    }
+
+
+    public List<RecommendationResultDto> getRecomendaciones() {
+        return recomendaciones;
+    }
+
+    public void setRecomendaciones(List<RecommendationResultDto> recomendaciones) {
+        this.recomendaciones = recomendaciones;
+    }
 }

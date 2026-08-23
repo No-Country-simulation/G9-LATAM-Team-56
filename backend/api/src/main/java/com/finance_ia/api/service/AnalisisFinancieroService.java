@@ -28,20 +28,41 @@ public class AnalisisFinancieroService {
     private final PerfilFinancieroOnnxService perfilService;
     private final ClasificadorTransaccionesOnnxService transaccionesService;
     private final RecommendationService recommendationService;
+    private final FinancialValidationService validationService;
+    private final PerfilFinancieroMapper perfilMapper;
 
     public AnalisisFinancieroService(
-            PerfilFinancieroOnnxService perfilService,
-            ClasificadorTransaccionesOnnxService transaccionesService,
-            RecommendationService recommendationService) {
+        PerfilFinancieroOnnxService perfilService,
+        ClasificadorTransaccionesOnnxService transaccionesService,
+        RecommendationService recommendationService,
+        FinancialValidationService validationService,
+        PerfilFinancieroMapper perfilMapper) {
 
         this.perfilService = perfilService;
         this.transaccionesService = transaccionesService;
         this.recommendationService = recommendationService;
+        this.validationService = validationService;
+        this.perfilMapper = perfilMapper;
     }
 
     public AnalisisFinancieroResponse analizar(
             AnalisisFinancieroRequest request
     ) {
+        if (request == null) {
+            throw new IllegalArgumentException(
+                    "La solicitud es obligatoria."
+            );
+        }
+        // Validación antes de ejecutar cualquier modelo
+        validationService.validarDatosFinancieros(
+                request.getIngreso_mensual(),
+                request.getNivel_endeudamiento(),
+                request.getFrecuencia_ahorro()
+        );
+
+        validationService.validarTransacciones(
+                request.getTransacciones()
+        );
 
         // 1. Preparar request para el clasificador de transacciones
         ClasificacionTransaccionesRequest clasificacionRequest
@@ -108,7 +129,7 @@ public class AnalisisFinancieroService {
                 = new AnalisisFinancieroResponse();
 
         response.setPerfil_financiero(
-                perfilResponse.getPerfil_financiero()
+            perfilMapper.toResponse(perfilResponse.getPerfil_financiero())
         );
 
         response.setProbabilidad(

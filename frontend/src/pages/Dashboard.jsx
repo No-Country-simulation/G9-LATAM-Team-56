@@ -51,6 +51,12 @@ function Dashboard() {
         // Solo actualizar el estado si el componente sigue montado
         if (isMounted) {
           setDashboardData(data);
+
+          // Si el usuario tiene un perfil financiero válido, actualizamos el localStorage
+          const tienePerfilValido = data && data.perfil_financiero && data.perfil_financiero !== "Desconocido" && data.perfil_financiero !== "Sin determinar";
+          if (tienePerfilValido) {
+            localStorage.setItem("csvCargado", "true");
+          }
         }
       } catch (err) {
         console.error("Error al cargar dashboard:", err);
@@ -115,6 +121,28 @@ function Dashboard() {
       claseCss: ""
     };
   };
+  /**
+ * Convierte el texto del perfil financiero a un valor numérico entre 0 y 100
+ * para ubicar la aguja en el centro del rango correspondiente:
+ * - En riesgo: centro en 16.6% (rango 0 a 33.3)
+ * - En observación: centro en 50% (rango 33.3 a 66.6)
+ * - Saludable: centro en 83.3% (rango 66.6 a 100)
+ */
+  const calcularScorePerfil = (perfil = "") => {
+    const perfilLimpio = perfil.trim().toLowerCase();
+
+    if (perfilLimpio === "en riesgo" || perfilLimpio === "riesgo") {
+      return 16.6; // Apunta al medio de la zona roja
+    }
+    if (perfilLimpio === "en observación" || perfilLimpio === "en observacion") {
+      return 50;   // Apunta al medio de la zona amarilla
+    }
+    if (perfilLimpio === "saludable") {
+      return 83.3; // Apunta al medio de la zona verde
+    }
+
+    return null; // Muestra sin aguja si el valor es desconocido
+  };
 
   // Uso seguro de datos con operador opcional (?.)
   const estadoSalud = obtenerEstadoSalud(dashboardData?.perfil_financiero);
@@ -126,9 +154,9 @@ function Dashboard() {
 
   const gastosGrafico = dashboardData?.resumen_gastos
     ? Object.entries(dashboardData.resumen_gastos).map(([categoria, monto]) => ({
-        categoria,
-        monto
-      }))
+      categoria,
+      monto
+    }))
     : [];
 
   // Flag para saber si el perfil no está determinado y ocultar la aguja del gráfico
@@ -186,7 +214,7 @@ function Dashboard() {
               onMouseOver={(e) => e.target.style.backgroundColor = "#1d4ed8"}
               onMouseOut={(e) => e.target.style.backgroundColor = "#2563eb"}
             >
-              Ir a la ventana Perfil
+              Ir a Perfil
             </button>
           </div>
         </div>
@@ -234,7 +262,11 @@ function Dashboard() {
                   </header>
 
                   <PieChartWithNeedle
-                    scoreValue={esSinDeterminar ? null : dashboardData.probabilidad * 100}
+                    scoreValue={
+                      esSinDeterminar
+                        ? null
+                        : calcularScorePerfil(dashboardData?.perfil_financiero)
+                    }
                     gaugeData={gaugeData}
                   />
                 </div>
@@ -346,30 +378,30 @@ function Dashboard() {
                           key={`${item.fecha}-${item.descripcion}-${index}`}
                           className="transaction-item"
                           role="row"
-                      >
-                        <span className="tx-date" role="cell">
-                          {formatearFecha(item.fecha)}
-                        </span>
+                        >
+                          <span className="tx-date" role="cell">
+                            {formatearFecha(item.fecha)}
+                          </span>
 
-                        <div className="tx-info" role="cell">
-                          <Icon
-                            icon={obtenerIconoCategoria(item.categoria)}
-                            width="20"
-                            height="20"
-                            className="tx-icon"
-                            aria-hidden="true"
-                          />
+                          <div className="tx-info" role="cell">
+                            <Icon
+                              icon={obtenerIconoCategoria(item.categoria)}
+                              width="20"
+                              height="20"
+                              className="tx-icon"
+                              aria-hidden="true"
+                            />
 
-                          <div className="tx-description">
-                            <span>{item.categoria}</span>
-                            <small>{item.descripcion}</small>
+                            <div className="tx-description">
+                              <span>{item.categoria}</span>
+                              <small>{item.descripcion}</small>
+                            </div>
                           </div>
-                        </div>
 
-                        <span className="tx-amount" role="cell">
-                          ${Number(item.valor || 0).toFixed(2)}
-                        </span>
-                      </div>
+                          <span className="tx-amount" role="cell">
+                            ${Number(item.valor || 0).toFixed(2)}
+                          </span>
+                        </div>
                       ))
                     )}
                   </div>
