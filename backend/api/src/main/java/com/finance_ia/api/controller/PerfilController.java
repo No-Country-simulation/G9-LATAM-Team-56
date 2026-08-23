@@ -1,9 +1,18 @@
 package com.finance_ia.api.controller;
 
+import com.finance_ia.api.infra.exception.ErrorResponse;
 import com.finance_ia.api.model.AnalisisFinancieroEntity;
 import com.finance_ia.api.model.UsuarioEntity;
 import com.finance_ia.api.repository.AnalisisFinancieroRepository;
 import com.finance_ia.api.repository.UsuarioRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +23,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
+@Tag(
+        name = "06. Perfil",
+        description = "Información del perfil financiero del usuario."
+)
 @RestController
 @RequestMapping("/api/perfil")
 @CrossOrigin(origins = "*") // Para evitar bloqueos CORS con React
@@ -28,8 +41,87 @@ public class PerfilController {
     }
 
     // Endpoint para obtener la información financiera del usuario por su email
+    @Operation(
+            summary = "Consultar perfil financiero",
+            description = "Obtiene los principales datos financieros asociados a un usuario mediante su correo electrónico."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Datos del perfil obtenidos correctamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    type = "object",
+                                    description = "Datos financieros del usuario."
+                            ),
+                            examples = @ExampleObject(
+                                    name = "Perfil financiero",
+                                    summary = "Datos financieros registrados",
+                                    value = """
+                                        {
+                                          "ingresoMensual": "$4,500.00",
+                                          "nivelEndeudamiento": "25.0%",
+                                          "saldoTotal": "$1,200.50",
+                                          "gastoTotal": "$3,299.50",
+                                          "moneda": "BOB"
+                                        }
+                                        """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuario no encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    type = "object"
+                            ),
+                            examples = @ExampleObject(
+                                    name = "Usuario no encontrado",
+                                    summary = "No existe un usuario con el correo proporcionado",
+                                    value = """
+                                        {
+                                          "error": "Usuario no encontrado"
+                                        }
+                                        """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Error interno del servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ErrorResponse.class
+                            ),
+                            examples = @ExampleObject(
+                                    name = "Error interno",
+                                    summary = "Error inesperado al consultar el perfil",
+                                    value = """
+                                {
+                                  "timestamp": "2026-08-23T10:30:00",
+                                  "status": 500,
+                                  "error": "INTERNAL_SERVER_ERROR",
+                                  "message": "Ocurrió un error interno en el servidor.",
+                                  "errors": []
+                                }
+                                """
+                            )
+                    )
+            )
+    })
     @GetMapping("/datos")
-    public ResponseEntity<?> obtenerDatosPerfil(@RequestParam("email") String email) {
+    public ResponseEntity<?> obtenerDatosPerfil(
+            @Parameter(
+                    description = "Correo electrónico del usuario cuyo perfil financiero se desea consultar.",
+                    example = "usuario@gmail.com",
+                    required = true
+            )
+            @RequestParam("email") String email
+    ) {
         // Buscamos primero al usuario por su correo para asegurarnos que exista y obtener su nombre
         Optional<UsuarioEntity> usuarioOpt = usuarioRepository.findByEmail(email);
 

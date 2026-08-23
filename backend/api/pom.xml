@@ -11,8 +11,10 @@
 	<groupId>com.finance-ia</groupId>
 	<artifactId>api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
+	<name>FinanceAI API</name>
+	<description>
+		API REST para análisis inteligente de salud financiera.
+	</description>
 	<url/>
 	<licenses>
 		<license/>
