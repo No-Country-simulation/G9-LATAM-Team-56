@@ -311,23 +311,77 @@ function EstadisticasA() {
         <div className="estadisticas-dark-bg">
           <header className="estadisticas-topbar">
             <div className="search-box">
-              <Icon icon="mdi:magnify" width="18" />
               <input type="text" placeholder="¿qué deseas buscar?" />
+              <Icon icon="mdi:magnify" width="18" />
             </div>
             <UserBadge />
           </header>
 
-          <section className="estadisticas-hero">
-            <div className="estadisticas-hero-title">
-              <h1>Estadísticas</h1>
-              <p>Análisis de tus finanzas</p>
+          {/* CONTENEDOR GENERAL UNIFICADO */}
+          <div className="estadisticas-grid-unificado">
+
+            {/* COLUMNA IZQUIERDA (Título centrado + Gráfico) */}
+            <div className="columna-izquierda">
+
+              <div className="estadisticas-hero-title">
+                <h1>Estadísticas</h1>
+                <p>Análisis de tus finanzas</p>
+              </div>
+
+              <div className="grafico-card">
+                <h2>EVOLUCIÓN GASTOS</h2>
+
+                          {/* Botones exclusivos para el Gráfico */}
+                            <div className="grafico-tabs">
+                              {rangosBotones.map((r) => (
+                                <button
+                                  key={r.key}
+                                  className={`grafico-tab ${rangoGrafico === r.key ? "active" : ""}`}
+                                  onClick={() => setRangoGrafico(r.key)}
+                                >
+                                  {r.label}
+                                </button>
+                              ))}
+                            </div>
+
+                            <div className="grafico-chart">
+                              <ResponsiveContainer width="100%" height={260}>
+                                {/* Si no hay datos, enviamos un array con valor 0 para mantener la estructura */}
+                                <LineChart data={datosGrafico.length > 0 ? datosGrafico : [{ name: 'Sin datos', valor: 0 }]}>
+                                  <CartesianGrid strokeDasharray="3 3" stroke="var(--neutro-ccc)" />
+                                  <XAxis dataKey="name" stroke="var(--neutro-666)" fontSize={12} />
+
+                                  {/* Agregamos domain={[0, 'auto']} para que el eje Y siempre sea visible */}
+                                  <YAxis
+                                    stroke="var(--neutro-666)"
+                                    fontSize={12}
+                                    domain={[0, 'auto']}
+                                  />
+
+                                  <Tooltip />
+                                  <Line
+                                    type="monotone"
+                                    dataKey="valor"
+                                    stroke="var(--color-secundario-azul)"
+                                    strokeWidth={2}
+                                    dot={{ r: 3 }}
+                                  />
+                                </LineChart>
+                              </ResponsiveContainer>
+                            </div>
+              </div>
             </div>
 
-            <div className="estadisticas-filtro">
-              <div className="filtro-label">
-                <Icon icon="mdi:filter-variant" width="18" />
-                <span>Filtrar por</span>
-              </div>
+            {/* COLUMNA DERECHA (Línea lateral (Filtro + Tarjetas) */}
+            <div className="tarjetas-lateral-container">
+              <div className="tarjetas-header-seccion">
+                <p className="subtitulo-tarjetas">Las categorías con más gastos</p>
+
+                <div className="estadisticas-filtro" style={{ marginBottom: "16px" }}>
+                  <div className="filtro-label">
+                    <Icon icon="mdi:filter-variant" width="18" />
+                    <span>Filtrar por</span>
+                  </div>
 
               {/* Selector exclusivo para las Tarjetas Top 3 */}
               <select
@@ -350,51 +404,7 @@ function EstadisticasA() {
                 </div>
               </div>
             </div>
-          </section>
-
-          <section className="estadisticas-content">
-            <div className="grafico-card">
-              <h2>EVOLUCIÓN GASTOS</h2>
-
-              {/* Botones exclusivos para el Gráfico */}
-              <div className="grafico-tabs">
-                {rangosBotones.map((r) => (
-                  <button
-                    key={r.key}
-                    className={`grafico-tab ${rangoGrafico === r.key ? "active" : ""}`}
-                    onClick={() => setRangoGrafico(r.key)}
-                  >
-                    {r.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="grafico-chart">
-                <ResponsiveContainer width="100%" height={260}>
-                  {/* Si no hay datos, enviamos un array con valor 0 para mantener la estructura */}
-                  <LineChart data={datosGrafico.length > 0 ? datosGrafico : [{ name: 'Sin datos', valor: 0 }]}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--neutro-ccc)" />
-                    <XAxis dataKey="name" stroke="var(--neutro-666)" fontSize={12} />
-
-                    {/* Agregamos domain={[0, 'auto']} para que el eje Y siempre sea visible */}
-                    <YAxis
-                      stroke="var(--neutro-666)"
-                      fontSize={12}
-                      domain={[0, 'auto']}
-                    />
-
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="valor"
-                      stroke="var(--color-secundario-azul)"
-                      strokeWidth={2}
-                      dot={{ r: 3 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
+          </div>
 
             {/* TARJETAS TOP 3 CATEGORÍAS CON ICONOS */}
             <div className="resumen-cards">
@@ -411,12 +421,14 @@ function EstadisticasA() {
                   </div>
                 ))
               ) : (
-                <p style={{ color: "#fff", padding: "10px" }}>Sin Datos registrados para este periodo</p>
+                <p style={{ color: "#33FFFF", padding: "10px" }}>Sin datos registrados para este período</p>
               )}
             </div>
-          </section>
+
+          </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

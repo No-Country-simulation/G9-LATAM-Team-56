@@ -45,23 +45,12 @@
   font-family: var(--font-texto);
 }
 
-.estadisticas-hero,
-.estadisticas-content {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 20px;
-  padding-left: 40px;
-  padding-right: 40px;
-}
 
-.estadisticas-hero {
-  padding-top: 30px;
-  padding-bottom: 10px;
-  align-items: center;
-}
 
 .estadisticas-hero-title {
   text-align: center;
+  width: 100%;
+  margin: 0 auto 10px auto;
 }
 
 .estadisticas-hero-title h1 {
@@ -74,7 +63,7 @@
 
 .estadisticas-hero-title p {
   font-family: var(--font-titulos);
-  font-size: 14px;
+  font-size: 16px;
   color: var(--color-terciario);
   font-weight: lighter;
 }
@@ -181,16 +170,16 @@
   background-color: var(--color-primario-azul);
 }
 
-.estadisticas-content {
-  padding-top: 20px;
-  padding-bottom: 50px;
-}
+
 
 .grafico-card {
   background-color: var(--color-terciario);
   border-radius: 14px;
   padding: 24px;
   min-width: 0;
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .grafico-card h2 {
@@ -236,6 +225,7 @@
   flex-direction: column;
   gap: 16px;
   min-width: 0;
+  width: 100%;
 }
 
 .resumen-card {
@@ -281,7 +271,7 @@
 
 .resumen-card-valor {
   font-family: var(--font-texto);
-  font-weight: 700;
+ /*  font-weight: 700;*/
   font-size: 18px;
   color: var(--color-primario-azul);
   font-weight: bold;
@@ -313,4 +303,66 @@
   color: var(--color-rojo);
   font-family: var(--font-texto);
   font-weight: lighter;
+}
+
+/* ========================================================
+   NUEVAS CLASES
+   ======================================================== */
+
+.columna-izquierda {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  width: 100%;
+}
+
+.estadisticas-grid-unificado {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  padding: 30px 40px 50px 40px;
+  align-items: start;
+}
+
+.tarjetas-lateral-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-left: 24px;
+  border-left: 2px solid rgba(255, 255, 255, 0.15); /* La línea vertical */
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.tarjetas-header-seccion {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.subtitulo-tarjetas {
+  color: var(--color-terciario);
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  font-family: var(--font-titulos);
+}
+
+/* ========================================================
+   RESPONSIVIDAD (Media Query para pantallas pequeñas)
+   ======================================================== */
+
+@media screen and (max-width: 1024px) {
+  .estadisticas-grid-unificado {
+    grid-template-columns: 1fr; /* Una sola columna */
+    padding: 20px;
+  }
+
+  .tarjetas-lateral-container {
+    border-left: none;
+    border-top: 2px solid rgba(255, 255, 255, 0.15);
+    padding-left: 0;
+    padding-top: 20px;
+  }
 }
