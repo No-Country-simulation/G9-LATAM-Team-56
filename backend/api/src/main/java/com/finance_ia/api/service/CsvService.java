@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,6 +46,7 @@ public class CsvService {
         "ingreso_mensual",
         "nivel_endeudamiento",
         "frecuencia_ahorro",
+        "divisa",
         "descripcion",
         "valor",
         "fecha"
@@ -114,12 +114,28 @@ public class CsvService {
             // el número de línea física del archivo: la primera
             // fila de datos corresponde a la línea 2, después del encabezado.
             int row = (int) record.getRecordNumber() + 1;
+            int cantidadEsperada = COLUMNAS_OBLIGATORIAS.size();
+
+            if (record.size() != cantidadEsperada) {
+
+                errors.add(new ErrorDetail(
+                        "columnas",
+                        "La fila debe contener exactamente "
+                                + cantidadEsperada
+                                + " columnas, pero contiene "
+                                + record.size()
+                                + ".",
+                        row
+                ));
+                continue;
+            }
 
             errors.addAll(
                 financialValidationService.validarRegistroCsv(
                     record.get("ingreso_mensual"),
                     record.get("nivel_endeudamiento"),
                     record.get("frecuencia_ahorro"),
+                    record.get("divisa"),
                     record.get("descripcion"),
                     record.get("valor"),
                     record.get("fecha"),
@@ -168,11 +184,7 @@ public class CsvService {
                     ingresoMensual = Double.parseDouble(record.get("ingreso_mensual"));
                     nivelEndeudamiento = Double.parseDouble(record.get("nivel_endeudamiento"));
                     frecuenciaAhorro = record.get("frecuencia_ahorro");
-                    divisa = record.get("divisa");
-
-                    if (divisa != null) {
-                        divisa = divisa.trim();
-                    }
+                    divisa = record.get("divisa").trim();
                     primeraFila = false;
                 }
 
