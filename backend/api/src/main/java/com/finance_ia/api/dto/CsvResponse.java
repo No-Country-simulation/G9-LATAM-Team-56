@@ -1,18 +1,60 @@
 package com.finance_ia.api.dto;
 
 import com.finance_ia.api.dto.recommendation.RecommendationResultDto;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
+@Schema(
+        name = "CsvResponse",
+        description = "Resultado del procesamiento de un archivo CSV financiero."
+)
 public class CsvResponse {
 
+    @Schema(
+            description = "Ingreso mensual declarado por el usuario.",
+            example = "5000.0"
+    )
     private double ingreso_mensual;
+
+    @Schema(
+            description = "Nivel de endeudamiento del usuario expresado como porcentaje.",
+            example = "35.5"
+    )
     private double nivel_endeudamiento;
+
+    @Schema(
+            description = "Frecuencia con la que el usuario realiza ahorros.",
+            example = "mensual"
+    )
     private String frecuencia_ahorro;
+
+    @Schema(
+            description = "Divisa utilizada en la información financiera.",
+            example = "BOB"
+    )
     private String divisa;
+
+    @Schema(
+            description = "Perfil financiero identificado para el usuario.",
+            example = "AHORRADOR"
+    )
     private String perfil_financiero;
+
+    @Schema(
+            description = "Probabilidad asociada al perfil financiero identificado.",
+            example = "0.87"
+    )
     private double probabilidad;
+
+    @Schema(
+            description = "Transacciones procesadas a partir del archivo CSV."
+    )
     private List<TransaccionResponse> transacciones;
+
+    @Schema(
+            description = "Recomendaciones financieras generadas a partir del análisis."
+    )
     private List<RecommendationResultDto> recomendaciones;
 
     public double getIngreso_mensual() {

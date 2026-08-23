@@ -149,6 +149,49 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void debeConvertirExcepcionInternaEnRespuesta500()
+            throws Exception {
+
+        when(service.analizar(any(AnalisisFinancieroRequest.class)))
+                .thenThrow(
+                        new RuntimeException("Error interno inesperado")
+                );
+
+        String requestJson = """
+        {
+            "ingreso_mensual": 5000,
+            "nivel_endeudamiento": 50,
+            "frecuencia_ahorro": "alta",
+            "transacciones": [
+                {
+                    "descripcion": "Compra supermercado",
+                    "valor": 100
+                }
+            ]
+        }
+        """;
+
+        mockMvc.perform(
+                        post("/analisis-financiero")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestJson)
+                )
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().contentTypeCompatibleWith(
+                        MediaType.APPLICATION_JSON
+                ))
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.error")
+                        .value("INTERNAL_SERVER_ERROR"))
+                .andExpect(jsonPath("$.message")
+                        .value(
+                                "Ocurrió un error interno en el servidor."
+                        ))
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors.length()").value(0));
+    }
+
+    @Test
     void debeConvertirHttpMessageNotReadableEnRespuesta400()
             throws Exception {
 

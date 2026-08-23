@@ -1,15 +1,39 @@
 package com.finance_ia.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 
+@Schema(
+        name = "TransaccionResponse",
+        description = "Transacción financiera con la categoría asignada durante el proceso de clasificación."
+)
 public class TransaccionResponse {
 
+    @Schema(
+            description = "Descripción de la transacción.",
+            example = "Supermercado"
+    )
     private String descripcion;
+
+    @Schema(
+            description = "Valor monetario de la transacción.",
+            example = "420.0"
+    )
     private Double valor;
+
+    @Schema(
+            description = "Categoría financiera asignada a la transacción.",
+            example = "ALIMENTACION"
+    )
     private String categoria;
 
+    @Schema(
+            description = "Fecha de la transacción.",
+            example = "15/08/2026",
+            type = "string"
+    )
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate fecha;
 
