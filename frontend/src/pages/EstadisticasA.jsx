@@ -229,7 +229,7 @@ function EstadisticasA() {
       const fechaIterador = new Date(hoy);
       fechaIterador.setMonth(hoy.getMonth() - 1);
       // Avanzar un día para iniciar el día siguiente al cierre del ciclo anterior si aplica, o exacto:
-      fechaIterador.setDate(fechaIterador.getDate() + 1);
+      fechaIterador.setDate(fechaIterador.getDate());
 
       while (fechaIterador <= hoy) {
         const fechaKey = fechaIterador.toISOString().split("T")[0];
