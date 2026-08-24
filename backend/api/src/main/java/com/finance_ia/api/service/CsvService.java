@@ -198,28 +198,11 @@ public class CsvService {
                 transacciones.add(transaccion);
             }
 
-            // Identificar el último mes presente en el CSV
-            LocalDate fechaMasReciente = transacciones.stream()
-                    .map(TransaccionRequest::getFecha)
-                    .max(LocalDate::compareTo)
-                    .orElse(LocalDate.now());
-            int mesObjetivo = fechaMasReciente.getMonthValue();
-            int anioObjetivo = fechaMasReciente.getYear();
+            // Definir el rango del mes financiero (Desde el mismo día del mes anterior hasta hoy)
+            LocalDate finMes = LocalDate.now(); // Fecha actual del sistema (Hoy)
+            LocalDate inicioMes = finMes.minusMonths(1); // Exactamente un mes antes (ej: 12/07/2026 si es 12/08/2026)
 
-            // Definir el rango del mes actual (desde el día 1 hasta el día actual de ese mes)
-            // Si el mes objetivo coincide con el mes actual del sistema, limitamos hasta LocalDate.now()
-            // De lo contrario, si es un mes histórico cerrado, toma el mes completo.
-            LocalDate inicioMes = LocalDate.of(anioObjetivo, mesObjetivo, 1);
-            LocalDate finMes;
-
-            LocalDate hoySistema = LocalDate.now();
-            if (mesObjetivo == hoySistema.getMonthValue() && anioObjetivo == hoySistema.getYear()) {
-                finMes = hoySistema; // Limita hasta el día actual del mes en curso
-            } else {
-                finMes = inicioMes.withDayOfMonth(inicioMes.lengthOfMonth()); // Mes completo histórico
-            }
-
-            // Filtrar transacciones del último mes pero acotadas desde el día 1 hasta el fin calculado (día actual o fin de mes)
+            // Filtrar transacciones comprendidas exactamente en el rango móvil del mes financiero
             List<TransaccionRequest> transaccionesUltimoMes = transacciones.stream()
                     .filter(t -> {
                         LocalDate f = t.getFecha();
