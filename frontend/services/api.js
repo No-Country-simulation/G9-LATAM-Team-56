@@ -1,11 +1,11 @@
 import axios from 'axios';
 
 // URLs de backend en Spring Boot
-const API_URL = 'http://localhost:8080/api/csv';
-const AUTH_URL = 'http://localhost:8080/api/auth';
-const PERFIL_URL = 'http://localhost:8080/api/perfil';
-const DASHBOARD_URL = 'http://localhost:8080/api/dashboard';
-const ESTADISTICAS_URL = 'http://localhost:8080/api/estadisticas';
+const API_URL = 'http://148.116.110.236:8080/api/csv';
+const AUTH_URL = 'http://148.116.110.236:8080/api/auth';
+const PERFIL_URL = 'http://148.116.110.236:8080/api/perfil';
+const DASHBOARD_URL = 'http://148.116.110.236:8080/api/dashboard';
+const ESTADISTICAS_URL = 'http://148.116.110.236:8080/api/estadisticas';
 
 export const uploadCsvFile = async (file, usuario) => {
   // Creamos un objeto FormData para enviar archivos y texto juntos

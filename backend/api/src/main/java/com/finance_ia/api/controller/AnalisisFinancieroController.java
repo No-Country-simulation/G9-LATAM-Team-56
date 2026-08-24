@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
         description = "Clasificación de transacciones y evaluación del perfil financiero."
 )
 @RestController
+@CrossOrigin(origins = "*") // Permitir peticiones desde React (CORS)
 public class AnalisisFinancieroController {
 
     private final AnalisisFinancieroService service;

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 )
 @RestController
 @RequestMapping("/api/dashboard")
+@CrossOrigin(origins = "*") // Permitir peticiones desde React (CORS)
 public class DashboardController {
 
     private final DashboardService dashboardService;
