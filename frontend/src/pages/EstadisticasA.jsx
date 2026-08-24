@@ -374,22 +374,31 @@ function EstadisticasA() {
                   {/* Si no hay datos, enviamos un array con valor 0 para mantener la estructura */}
                   <LineChart data={datosGrafico.length > 0 ? datosGrafico : [{ name: 'Sin datos', valor: 0 }]}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--neutro-ccc)" />
-                    <XAxis dataKey="name" stroke="var(--neutro-666)" fontSize={12} />
-
+                    {/* Aplicar padding dinámico en el Eje X según el botón seleccionado (Día vs otros) */}
+                    <XAxis
+                      dataKey="name"
+                      stroke="var(--neutro-666)"
+                      fontSize={12}
+                      // Si es "hoy", espaciamos los extremos (padding) para que las categorías no peguen contra los bordes
+                      padding={rangoGrafico === "hoy" ? { left: 50, right: 50 } : { left: 10, right: 10 }}
+                      // Si hay un solo elemento en "hoy", forzamos que se ubique centrado en el gráfico
+                      scale={rangoGrafico === "hoy" && datosGrafico.length === 1 ? "band" : "auto"}
+                    />
                     {/* Agregamos domain={[0, 'auto']} para que el eje Y siempre sea visible */}
                     <YAxis
                       stroke="var(--neutro-666)"
                       fontSize={12}
                       domain={[0, 'auto']}
                     />
-
+                    {/* Si es "hoy" y hay exactamente 1 categoría, permitimos mostrar el punto del gráfico asegurando que conecte o dibuje el dot visible */}
                     <Tooltip />
                     <Line
                       type="monotone"
                       dataKey="valor"
                       stroke="var(--color-secundario-azul)"
                       strokeWidth={2}
-                      dot={{ r: 3 }}
+                      dot={{ r: datosGrafico.length === 1 ? 5 : 3 }}
+                      isAnimationActive={false}
                     />
                   </LineChart>
                 </ResponsiveContainer>
