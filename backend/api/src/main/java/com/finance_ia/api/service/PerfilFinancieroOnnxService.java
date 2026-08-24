@@ -88,7 +88,7 @@ public class PerfilFinancieroOnnxService {
             Map<String, OnnxTensor> inputs = new HashMap<>();
 
             inputs.put(
-                    "gasto_total",
+                    "gasto_mensual",
                     OnnxTensor.createTensor(
                             env,
                             new float[][]{
