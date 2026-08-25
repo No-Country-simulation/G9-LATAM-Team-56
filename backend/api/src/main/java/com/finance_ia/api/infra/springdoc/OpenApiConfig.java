@@ -45,7 +45,7 @@ public class OpenApiConfig {
                                 .url("https://github.com/No-Country-simulation/G9-LATAM-Team-56"))
                         .license(new License()
                                 .name("MIT License")
-                                .url("https://opensource.org/licenses/MIT")))
+                                .url("/mit-license.html")))
                 .servers(List.of(ociServer, localServer));
     }
 }
