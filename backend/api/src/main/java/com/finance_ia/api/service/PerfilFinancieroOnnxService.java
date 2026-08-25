@@ -87,22 +87,20 @@ public class PerfilFinancieroOnnxService {
 
             Map<String, OnnxTensor> inputs = new HashMap<>();
 
-            inputs.put(
-                    "gasto_mensual",
-                    OnnxTensor.createTensor(
-                            env,
-                            new float[][]{
-                                {request.getGasto_total().floatValue()}
-                            }
-                    )
-            );
+            // Cálculo del ratio financiero (gasto_mensual / ingreso_mensual).
+            // Se usa doubleValue() y se valida que el ingreso no sea nulo o cero para evitar excepciones aritméticas (Division by zero).
+            double gasto = request.getGasto_total() != null ? request.getGasto_total().doubleValue() : 0.0;
+            double ingreso = request.getIngreso_mensual() != null ? request.getIngreso_mensual().doubleValue() : 0.0;
+            double ratioCalculado = (ingreso > 0.0) ? (gasto / ingreso) : 0.0;
 
+            // Se elimina la entrada separada de "gasto_mensual" e "ingreso_mensual"
+            // y se reemplazan por la única entrada "ratio" requerida por la nueva versión del modelo ONNX.
             inputs.put(
-                    "ingreso_mensual",
+                    "ratio",
                     OnnxTensor.createTensor(
                             env,
                             new float[][]{
-                                {request.getIngreso_mensual().floatValue()}
+                                    {(float) ratioCalculado}
                             }
                     )
             );

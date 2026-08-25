@@ -56,7 +56,7 @@ function EstadisticasA() {
     if (!nombreCategoria) return "mdi:tag-outline";
     const cat = nombreCategoria.toLowerCase();
 
-    if (cat.includes("vivienda")) { return "mdi:mdi:home-outline"; }
+    if (cat.includes("vivienda")) { return "mdi:home-outline"; }
     if (cat.includes("servicios")) { return "mdi:lightning-bolt-outline" }
     if (cat.includes("alimentacion")) { return "mdi:cart-outline"; }
     if (cat.includes("transporte")) { return "mdi:car-outline"; }
@@ -77,26 +77,35 @@ function EstadisticasA() {
   useEffect(() => {
     const ahora = new Date();
     let inicio = new Date();
-    let fin = new Date();
+    let fin = new Date(ahora);
 
     if (periodoFiltro === "semana") {
-      const diaSemana = ahora.getDay();
-      const diffToMonday = ahora.getDate() - diaSemana + (diaSemana === 0 ? -6 : 1);
-      inicio = new Date(ahora.setDate(diffToMonday));
-      fin = new Date();
+      // Últimos 7 días exactos hacia atrás desde hoy
+      inicio = new Date(ahora);
+      inicio.setDate(ahora.getDate() - 6);
     } else if (periodoFiltro === "mes") {
+      // Desde el primer día del mes actual hasta ahora
       inicio = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
-      fin = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0);
     } else if (periodoFiltro === "trimestre") {
+      // Desde el inicios de trimestre hasta ahora
       inicio = new Date(ahora.getFullYear(), ahora.getMonth() - 3, 1);
       fin = new Date();
     } else if (periodoFiltro === "anio") {
+      // CAMBIO: Desde el primer día del año actual hasta ahora
       inicio = new Date(ahora.getFullYear(), 0, 1);
-      fin = new Date(ahora.getFullYear(), 11, 31);
     }
 
-    setFechaInicioFiltro(inicio.toISOString().split("T")[0]);
-    setFechaFinFiltro(fin.toISOString().split("T")[0]);
+      // Función auxiliar para formatear la fecha localmente y evitar desfases de zona horaria
+      const formatearFechaLocal = (fecha) => {
+      const anio = fecha.getFullYear();
+      const mes = String(fecha.getMonth() + 1).padStart(2, "0");
+      const dia = String(fecha.getDate()).padStart(2, "0");
+      return `${anio}-${mes}-${dia}`;
+    };
+
+
+    setFechaInicioFiltro(formatearFechaLocal(inicio));
+    setFechaFinFiltro(formatearFechaLocal(fin));
   }, [periodoFiltro]);
 
   useEffect(() => {
